@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+
+	<TextView android:text="@string/lblUsernameEnter" android:id="@+id/TextView03"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"></TextView>
+
+	<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:stretchColumns="1">
+		<TableRow>
+			<TextView android:text="@string/lblUsername" android:id="@+id/TextView01"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+			<EditText android:id="@+id/txtUsername"
+				android:layout_weight="1" android:layout_width="fill_parent"
+				android:layout_height="wrap_content"></EditText>
+		</TableRow>
+
+		<TableRow>
+			<TextView android:text="@string/lblPassword" android:id="@+id/TextView02"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+			<EditText android:id="@+id/txtPassword"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:password="true"></EditText>
+		</TableRow>
+
+
+	</TableLayout>
+	<TextView android:text="@string/lblSetupWarning" android:id="@+id/TextView04"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"></TextView>
+</LinearLayout>

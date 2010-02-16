@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">SAP Note Viewer</string>
+	<string name="app_name_setup">SAP Note Viewer Setup</string>
+	<string name="app_name_list">SAP Note Viewer List</string>
+
+	<string name="bView">View</string>
+	<string name="lblNote">SAP Note:</string>
+	<string name="lblUsername">SAP username:</string>
+	<string name="lblPassword">Password:</string>
+
+	<string name="lblUsernameEnter">Please enter you SAP service marketplace user (used
+		for authentication)</string>
+	<string name="lblSetupWarning">If the note fails to load, it is most likely the
+		username which is wrong (android API doesn\'t report this properly)
+	</string>
+
+	<string name="menuAdd">Add to favorite</string>
+	<string name="menuSetup">Setup</string>
+	<string name="menuView">View Notes</string>
+	<string name="menuFavorites">Favorites</string>
+	<string name="menuClear">Clear settings</string>
+	
+	<string name="contextMenuView">View</string>
+	<string name="contextMenuDelete">Delete</string>
+
+	<string name="listNoNotes">No Notes have been stored. Select View Notes from menu to continue</string>
+</resources>
