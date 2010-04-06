@@ -80,13 +80,13 @@ public class SAPNoteDbAdapter {
      *         initialization call)
      * @throws SQLException if the database could be neither opened or created
      */
-    public SAPNoteDbAdapter open() throws SQLException {
+    private SAPNoteDbAdapter openDB() throws SQLException {
         mDbHelper = new DatabaseHelper(mCtx);
         mDb = mDbHelper.getWritableDatabase();
         return this;
     }
     
-    public void close() {
+    private void closeDB() {
         mDbHelper.close();
     }
 
@@ -101,11 +101,13 @@ public class SAPNoteDbAdapter {
      * @return rowId or -1 if failed
      */
     public long createNote(long noteNr, String title) {
-        ContentValues initialValues = new ContentValues();
+        openDB();
+    	ContentValues initialValues = new ContentValues();
         initialValues.put(KEY_TITLE, title);
         initialValues.put(KEY_NOTENR, noteNr);
-
-        return mDb.insert(DATABASE_TABLE, null, initialValues);
+        long ret= mDb.insert(DATABASE_TABLE, null, initialValues);
+        closeDB();
+        return ret;
     }
 
     /**
@@ -115,8 +117,10 @@ public class SAPNoteDbAdapter {
      * @return true if deleted, false otherwise
      */
     public boolean deleteNote(long noteNr) {
-
-        return mDb.delete(DATABASE_TABLE, KEY_NOTENR + "=" + noteNr, null) > 0;
+    	openDB();
+    	boolean bRet = mDb.delete(DATABASE_TABLE, KEY_NOTENR + "=" + noteNr, null) > 0;
+    	closeDB();
+    	return bRet;
     }
 
     /**
@@ -125,8 +129,10 @@ public class SAPNoteDbAdapter {
      * @return Cursor over all notes
      */
     public Cursor fetchAllNotes() {
-
-        return mDb.query(DATABASE_TABLE, new String[] {KEY_NOTENR, KEY_TITLE}, null, null, null, null, null);
+    	openDB();
+        Cursor c= mDb.query(DATABASE_TABLE, new String[] {KEY_NOTENR, KEY_TITLE}, null, null, null, null, null);
+      //cursors handle the closing themselves closeDB();
+        return c;
     }
 
     /**
@@ -137,7 +143,7 @@ public class SAPNoteDbAdapter {
      * @throws SQLException if note could not be found/retrieved
      */
     public Cursor fetchNote(long noteNr) throws SQLException {
-
+    	openDB();
         Cursor mCursor =
 
                 mDb.query(true, DATABASE_TABLE, new String[] {KEY_NOTENR,
@@ -146,6 +152,8 @@ public class SAPNoteDbAdapter {
         if (mCursor != null) {
             mCursor.moveToFirst();
         }
+        
+        //cursors handle the closing themselves closeDB();
         return mCursor;
 
     }
