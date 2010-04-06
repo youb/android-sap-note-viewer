@@ -60,7 +60,7 @@ public class SAPNoteView extends Activity {
 
 		// open database of favorites
 		mDbHelper = new SAPNoteDbAdapter(this);
-		mDbHelper.open();
+		//mDbHelper.open();
 
 		// needed in order to get progress bar
 		getWindow().requestFeature(Window.FEATURE_PROGRESS);
@@ -116,6 +116,12 @@ public class SAPNoteView extends Activity {
 		Toast
 				.makeText(SAPNoteView.this, "Loading " + strURL,
 						Toast.LENGTH_LONG).show();
+		
+		
+		//String strHTML = "<html><body>Summary Symptom<P>If you correct the cumulative received quantity in a delivery schedule,  the system does not always adjust the requirements in the schedule lines  of scheduling agreement. In particular, after you increase the cumulative received quantity, requirements are missing.</P> <b>Additional key words</b><br> <P>VA32, delivery schedule, JIT delivery schedule, fiscal year changes, VBLB-ABEFZ, TVEP-ATTPR MD04, requirement</P> <b>Cause and prerequisites</b><br> <P>The problem is caused by a program error which occurs if you only change  the cumulative received quantity but do not correct any item data or schedule lines.<BR>The error only occurs if the system does not check availability.</P><b>Solution</b><br> <P>First implement the advance correction described in Note 88357 (unless you are already been using Release 4.0B).<BR>Then make the following two changes in the ABAP/4 Dictionary and  implement the attached advance corrections.<BR>Finally, use program SDRQCR21 to correct the existing incorrect requirements.<BR></P><OL>1. Call up Transaction SE11 and create the data element BEDUP  (development class VA). Enter 'XFELD' as the domain name and 'Requirements update indicator' as the short text. Deactivate the  'Maintain field labels' flag. Save and activate.</OL> <OL>2. Call up Transaction SE11 and change structure WVBAP. Choose 'Edit -&gt;  New fields'. Enter 'BEDUP' as a new field name and as the data element. Save and activate.</OL> <P><BR>Also note that if you have already applied Note 73251 (program LV03VF0B)  in your system that you should implement the advance correction as of Release 3.1H.<BR><BR></P>Header Data</body></html>";
+		//String strHTML = "<html><body>hello</body></html>";
+		//webview.loadData(strHTML, "text/html", "UTF-8");
+		
 		//change the url
 		webview.loadUrl("http://service.sap.com/sap/support/notes/" + strNote);
 

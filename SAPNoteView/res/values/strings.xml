@@ -2,7 +2,7 @@
 <resources>
 	<string name="app_name">SAP Note Viewer</string>
 	<string name="app_name_setup">SAP Note Viewer Setup</string>
-	<string name="app_name_list">SAP Note Viewer List</string>
+	<string name="app_name_list">SAP Note Viewer</string>
 
 	<string name="bView">View</string>
 	<string name="lblNote">SAP Note:</string>

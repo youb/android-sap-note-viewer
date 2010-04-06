@@ -30,7 +30,7 @@ public class SAPNoteList extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.list);
 		mDbHelper = new SAPNoteDbAdapter(this);
-		mDbHelper.open();
+		//mDbHelper.open();
 		fillData();
 
 		registerForContextMenu(getListView());
