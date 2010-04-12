@@ -1,5 +1,6 @@
 package org.sapmentors.sapnoteview;
 
+
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -169,6 +171,20 @@ public class SAPNoteView extends Activity {
 			return super.onMenuItemSelected(featureId, item);
 		}
 
+	}
+	
+
+	/**
+	 * Override method in order to avoid 
+	 * webview reload on changed orientation.
+	 * 
+	 * Also requires modification in AndroidManifest.xml
+	 * See http://stackoverflow.com/questions/1002085/android-webview-handling-orientation-changes
+	 */
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		// TODO Auto-generated method stub
+		super.onConfigurationChanged(newConfig);
 	}
 
 	private void addNoteToFavorites(String strNote) {
