@@ -1,13 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="org.sapmentors.sapnoteview"
-      android:versionCode="6"
-      android:versionName="1.05">
+      android:versionCode="9"
+      android:versionName="1.2_rc1">
     <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="false">
         <activity android:name=".SAPNoteView"
                   android:label="@string/app_name"
                   android:configChanges="orientation"
                    >
+					<intent-filter>
+					<action android:name="android.intent.action.VIEW" />
+					<category android:name="android.intent.category.DEFAULT"></category>
+					<category android:name="android.intent.category.BROWSABLE"></category>
+					<data android:host="service.sap.com" android:scheme="https"></data>
+					<data android:host="websmp100.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp101.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp102.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp103.sap-ag.de" android:scheme="https"></data>					
+					<data android:host="websmp110.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp111.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp112.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp113.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp120.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp121.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp122.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp123.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp130.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp131.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp132.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp133.sap-ag.de" android:scheme="https"></data>
+					
+					<data android:host="websmp200.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp201.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp202.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp203.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp210.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp211.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp212.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp213.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp220.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp221.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp222.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp223.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp230.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp231.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp232.sap-ag.de" android:scheme="https"></data>
+					<data android:host="websmp233.sap-ag.de" android:scheme="https"></data>
+					
+					</intent-filter>
+                   
         </activity>
         <activity android:name=".SAPNoteSetup"
                   android:label="@string/app_name_setup">

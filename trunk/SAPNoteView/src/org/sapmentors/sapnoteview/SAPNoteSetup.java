@@ -43,8 +43,6 @@ public class SAPNoteSetup extends Activity {
 
 	}
 
-	
-	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();

@@ -18,10 +18,12 @@
 	<string name="menuAdd">Add to favorite</string>
 	<string name="menuSetup">Setup</string>
 	<string name="menuView">View Notes</string>
+	<string name="menuShare">Share note</string>
 	<string name="menuFavorites">Favorites</string>
 	<string name="menuClear">Clear settings</string>
 	
 	<string name="contextMenuView">View</string>
+	<string name="contextMenuShare">Share</string>
 	<string name="contextMenuDelete">Delete</string>
 
 	<string name="listNoNotes">No Notes have been stored. Select View Notes from menu to continue</string>
