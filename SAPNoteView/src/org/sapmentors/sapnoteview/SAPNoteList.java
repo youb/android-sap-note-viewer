@@ -4,6 +4,7 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.Editable;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,9 +19,11 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 public class SAPNoteList extends ListActivity {
 	private static final int ACTIVITY_CREATE = 0;
 	private static final int ACTIVITY_EDIT = 1;
+	
 
 	private static final int ACTION_VIEW = Menu.FIRST;
-	private static final int ACTION_DELETE = Menu.FIRST + 1;
+	private static final int ACTION_SHARE= Menu.FIRST+1;
+	private static final int ACTION_DELETE = Menu.FIRST + 2;
 
 	private SAPNoteDbAdapter mDbHelper;
 
@@ -77,6 +80,8 @@ public class SAPNoteList extends ListActivity {
 			startActivity(i2);
 
 			return true;
+			
+		
 		default:
 			return super.onMenuItemSelected(featureId, item);
 		}
@@ -87,6 +92,7 @@ public class SAPNoteList extends ListActivity {
 			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		menu.add(0, ACTION_VIEW, 0, R.string.contextMenuView);
+		menu.add(0, ACTION_SHARE, 0, R.string.contextMenuShare);
 		menu.add(0, ACTION_DELETE, 0, R.string.contextMenuDelete);
 	}
 
@@ -100,6 +106,17 @@ public class SAPNoteList extends ListActivity {
 			i1.putExtra(SAPNoteView.KEY_ID, info.id);
 			startActivity(i1);
 			return true;
+		case  ACTION_SHARE:
+			String strNote2 = info.id + "";
+			String shareTxt= "Note " + strNote2 + " http://service.sap.com/sap/support/notes/" + strNote2;
+			Intent shareIntent = new Intent();
+			shareIntent.setAction(Intent.ACTION_SEND);
+			shareIntent.setType("text/plain");
+			shareIntent.putExtra(Intent.EXTRA_TEXT, shareTxt);
+			
+			/* Send it off to the Activity-Chooser */  
+			startActivity(Intent.createChooser(shareIntent, "Share note.."));  
+			return true;			
 		case ACTION_DELETE:
 			deleteNote(info.id);
 
