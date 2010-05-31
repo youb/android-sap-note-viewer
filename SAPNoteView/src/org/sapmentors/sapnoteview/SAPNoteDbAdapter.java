@@ -158,6 +158,30 @@ public class SAPNoteDbAdapter {
         return mCursor;
 
     }
+    
+    /**
+     * Return a Cursor positioned at the note that matches the given rowId
+     * 
+     * @param rowId id of note to retrieve
+     * @return Cursor positioned to matching note, if found
+     * @throws SQLException if note could not be found/retrieved
+     */
+    public String fetchTitleForNote(long noteNr) throws SQLException {
+    	openDB();
+        Cursor mCursor =
+
+                mDb.query(true, DATABASE_TABLE, new String[] {KEY_NOTENR,
+                        KEY_TITLE,}, KEY_NOTENR + "=" + noteNr, null,
+                        null, null, null, null);
+        if (mCursor != null) {
+            mCursor.moveToFirst();
+            String title = mCursor.getString(mCursor.getColumnIndex(KEY_TITLE));
+            return title;
+        }else {
+        	return null;
+        }
+        
+    }
 
     /**
      * Update the note using the details provided. The note to be updated is
