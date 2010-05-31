@@ -108,7 +108,8 @@ public class SAPNoteList extends ListActivity {
 			return true;
 		case  ACTION_SHARE:
 			String strNote2 = info.id + "";
-			String shareTxt= "Note " + strNote2 + " http://service.sap.com/sap/support/notes/" + strNote2;
+			String strNoteTitle = mDbHelper.fetchTitleForNote(info.id);
+			String shareTxt= "http://service.sap.com/sap/support/notes/" + strNote2 + " " + strNoteTitle;
 			Intent shareIntent = new Intent();
 			shareIntent.setAction(Intent.ACTION_SEND);
 			shareIntent.setType("text/plain");

@@ -9,6 +9,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -173,13 +174,22 @@ public class SAPNoteView extends Activity {
 	 
 	        HttpGet httpget = new HttpGet(strURL);
 	        
-	        System.out.println("executing request" + httpget.getRequestLine());
+	        
 	        HttpResponse response = httpclient.execute(httpget);
 	        HttpEntity entity = response.getEntity();
-	
+	        String contentType= entity.getContentType().getValue();
+	        Log.d(this.getClass().getName(), "Response has contentType "+contentType);
+	        
+	        //handle different content types
+	        if(contentType==null || !contentType.startsWith("text")){
+	        	Toast.makeText(SAPNoteView.this, "Downloads are not supported in current version. Content-type:" + contentType,Toast.LENGTH_LONG).show();
+	        	return;
+	        }
+	        
 	        InputStream is =entity.getContent();
 	        String htmlOrg = convertStreamToString(is);
 	        
+	        //if we followed a link, we need to sniff the note number from the html
 	        if(bAttemptToSniffNoteFromHTTP){
 	        	String sapNoteNr= getNoteNrFromString(htmlOrg);
 	        	if(sapNoteNr!=null){
@@ -189,13 +199,16 @@ public class SAPNoteView extends Activity {
 	        	}
 	        	
 	        }
+	        
 	        //try to read the name of the note
 	        strNoteTitle= getNoteTitleFromString(htmlOrg);
 	        if(strNoteTitle==null){
 	        	strNoteTitle = "Note " + ((Editable) txtNote.getText()).toString();
 	        }
+	        strNoteTitle.replaceAll("&amp;", "&");
 	        
-	        htmlOrg = htmlOrg.replaceAll("\\<div id=\"oc_1\".*?\\>","<div id=\"oc_1\">");
+	        //background-color tricks seems to work in chrome, but not on android
+	        htmlOrg = htmlOrg.replaceAll("\\<div id=\"oc_1\".*?\\>","<div id=\"oc_1\" ct=\"SC\" class=\"urScrl\" style=\"background-color:#FFFFFF;\" >");
 	        
 	        
 	        webview.loadDataWithBaseURL("https://service.sap.com", htmlOrg, "text/html", "utf-8", null);
@@ -215,16 +228,6 @@ public class SAPNoteView extends Activity {
 	        	httpclient.getConnectionManager().shutdown();
 	        }
 		}
-
- 
-		
-		
-		//String strHTML = "<html><body>Summary Symptom<P>If you correct the cumulative received quantity in a delivery schedule,  the system does not always adjust the requirements in the schedule lines  of scheduling agreement. In particular, after you increase the cumulative received quantity, requirements are missing.</P> <b>Additional key words</b><br> <P>VA32, delivery schedule, JIT delivery schedule, fiscal year changes, VBLB-ABEFZ, TVEP-ATTPR MD04, requirement</P> <b>Cause and prerequisites</b><br> <P>The problem is caused by a program error which occurs if you only change  the cumulative received quantity but do not correct any item data or schedule lines.<BR>The error only occurs if the system does not check availability.</P><b>Solution</b><br> <P>First implement the advance correction described in Note 88357 (unless you are already been using Release 4.0B).<BR>Then make the following two changes in the ABAP/4 Dictionary and  implement the attached advance corrections.<BR>Finally, use program SDRQCR21 to correct the existing incorrect requirements.<BR></P><OL>1. Call up Transaction SE11 and create the data element BEDUP  (development class VA). Enter 'XFELD' as the domain name and 'Requirements update indicator' as the short text. Deactivate the  'Maintain field labels' flag. Save and activate.</OL> <OL>2. Call up Transaction SE11 and change structure WVBAP. Choose 'Edit -&gt;  New fields'. Enter 'BEDUP' as a new field name and as the data element. Save and activate.</OL> <P><BR>Also note that if you have already applied Note 73251 (program LV03VF0B)  in your system that you should implement the advance correction as of Release 3.1H.<BR><BR></P>Header Data</body></html>";
-		//String strHTML = "<html><body>hello</body></html>";
-		//webview.loadData(strHTML, "text/html", "UTF-8");
-		
-		//change the url
-		//webview.loadUrl("http://service.sap.com/sap/support/notes/" + strNote);
 
 	}
 	
@@ -262,7 +265,7 @@ public class SAPNoteView extends Activity {
 			return true;
 		case R.id.menuShare:
 			String strNote2 = ((Editable) txtNote.getText()).toString();
-			String shareTxt= "Note " + strNote2 + " http://service.sap.com/sap/support/notes/" + strNote2;
+			String shareTxt= "http://service.sap.com/sap/support/notes/" + strNote2 + " "+ strNoteTitle;
 			Intent shareIntent = new Intent();
 			shareIntent.setAction(Intent.ACTION_SEND);
 			shareIntent.setType("text/plain");
