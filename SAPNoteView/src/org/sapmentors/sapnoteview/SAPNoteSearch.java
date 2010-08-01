@@ -23,6 +23,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultRedirectHandler;
 import org.apache.http.protocol.HttpContext;
 
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -61,6 +63,8 @@ public class SAPNoteSearch extends Activity {
 
 	private WebView webview;
 
+	private GoogleAnalyticsTracker tracker;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -84,6 +88,11 @@ public class SAPNoteSearch extends Activity {
 		
 		setContentView(R.layout.activity_search);		
 		UIFrameworkSetup();
+		
+		//anonymous tracker
+		tracker = GoogleAnalyticsTracker.getInstance();
+	    tracker.start(Analytics.ANALYTICS_ID, 60,this);
+	    tracker.trackPageView("/search");
 
 		webview = (WebView) findViewById(R.id.webview);
 		webview.setWebViewClient(new SAPNoteViewClient());
