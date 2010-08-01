@@ -1,5 +1,7 @@
 package org.sapmentors.sapnoteview;
 
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+
 import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
@@ -28,6 +30,8 @@ public class SAPNoteList extends ListActivity {
 	private static final int ACTION_VIEW = Menu.FIRST;
 	private static final int ACTION_SHARE= Menu.FIRST+1;
 	private static final int ACTION_DELETE = Menu.FIRST + 2;
+	
+	GoogleAnalyticsTracker tracker;
 
 	private SAPNoteDbAdapter mDbHelper;
 
@@ -37,6 +41,11 @@ public class SAPNoteList extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_favorites);
 		UIFrameworkSetup();
+		
+		//anonymous tracker
+		tracker = GoogleAnalyticsTracker.getInstance();
+	    tracker.start(Analytics.ANALYTICS_ID, 60,this);
+	    tracker.trackPageView("/favorites");
 		
 		
 		mDbHelper = new SAPNoteDbAdapter(this);

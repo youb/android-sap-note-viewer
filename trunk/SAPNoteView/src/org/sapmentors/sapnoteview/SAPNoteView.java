@@ -23,6 +23,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultRedirectHandler;
 import org.apache.http.protocol.HttpContext;
 
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -70,6 +72,8 @@ public class SAPNoteView extends Activity {
 
 	private SAPNoteDbAdapter mDbHelper;
 
+	private GoogleAnalyticsTracker tracker;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -100,7 +104,11 @@ public class SAPNoteView extends Activity {
 		
 		setContentView(R.layout.activity_view);		
 		UIFrameworkSetup();
-
+		
+		//anonymous tracker
+		tracker = GoogleAnalyticsTracker.getInstance();
+	    tracker.start(Analytics.ANALYTICS_ID, 60,this);
+	    tracker.trackPageView("/view");
 
 		// set up view
 		txtNote = (EditText) findViewById(R.id.txtNote);

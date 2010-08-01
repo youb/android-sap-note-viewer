@@ -1,5 +1,7 @@
 package org.sapmentors.sapnoteview;
 
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -18,13 +20,21 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 public class SAPNoteHome extends Activity {
-
+	GoogleAnalyticsTracker tracker;
+	
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.home);
 
+		//anonymous tracker
+		tracker = GoogleAnalyticsTracker.getInstance();
+	    tracker.start(Analytics.ANALYTICS_ID, 60,this);
+	    tracker.trackPageView("/home");
+		
+		
 		final Activity thisActivity=this;
 		
 		// setup button

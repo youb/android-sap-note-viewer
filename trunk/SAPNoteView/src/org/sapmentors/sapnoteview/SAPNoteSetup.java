@@ -1,6 +1,8 @@
 package org.sapmentors.sapnoteview;
 
 
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +25,7 @@ public class SAPNoteSetup extends Activity {
 	public static final String PREFS_NAME = "SAPNotePrefs";
 	private EditText txtUsername;
 	private EditText txtPassword;
+	private GoogleAnalyticsTracker tracker;
 
 
 	@Override
@@ -30,9 +33,11 @@ public class SAPNoteSetup extends Activity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_setup);
-
 		UIFrameworkSetup();
-		
+		//anonymous tracker
+		tracker = GoogleAnalyticsTracker.getInstance();
+	    tracker.start(Analytics.ANALYTICS_ID, 60,this);
+	    tracker.trackPageView("/setup");
 	
 		// set up view
 		txtUsername = (EditText) findViewById(R.id.txtUsername);
