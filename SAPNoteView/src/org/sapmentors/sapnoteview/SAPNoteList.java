@@ -1,5 +1,6 @@
 package org.sapmentors.sapnoteview;
 
+import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -11,8 +12,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.View.OnClickListener;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
@@ -31,7 +35,10 @@ public class SAPNoteList extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.list);
+		setContentView(R.layout.activity_favorites);
+		UIFrameworkSetup();
+		
+		
 		mDbHelper = new SAPNoteDbAdapter(this);
 		//mDbHelper.open();
 		fillData();
@@ -39,6 +46,29 @@ public class SAPNoteList extends ListActivity {
 		registerForContextMenu(getListView());
 	}
 
+	private void UIFrameworkSetup(){
+		((TextView) findViewById(R.id.title_text)).setText(getTitle());
+		
+		final Activity thisActivity = this;
+		ImageButton bHome = (ImageButton) this.findViewById(R.id.title_home_button);
+		bHome.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				Intent i = new Intent(thisActivity, SAPNoteHome.class);
+				i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				thisActivity.startActivity(i);
+			}
+		});
+		
+		ImageButton bSearch = (ImageButton) thisActivity.findViewById(R.id.title_search_button);
+		bSearch.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				Intent i = new Intent(thisActivity, SAPNoteView.class);
+				i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				thisActivity.startActivity(i);
+			}
+		});
+	}	
+	
 	private void fillData() {
 
 		Cursor notesCursor = mDbHelper.fetchAllNotes();
@@ -54,7 +84,7 @@ public class SAPNoteList extends ListActivity {
 
 		// Now create a simple cursor adapter and set it to display
 		SimpleCursorAdapter notes = new SimpleCursorAdapter(this,
-				R.layout.list_row, notesCursor, from, to);
+				R.layout.content_favorites_row, notesCursor, from, to);
 
 		setListAdapter(notes);
 

@@ -56,26 +56,14 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class SAPNoteView extends Activity {
+public class SAPNoteSearch extends Activity {
 	public static final String PREFS_NAME = "SAPNotePrefs";
 
-	public static final String KEY_ID = "SAPNoteNr";
-
 	private WebView webview;
-	private Button bView;
-	private EditText txtNote;
-	
-	private boolean bAttemptToSniffNoteFromHTTP=false;
-	private String strNoteTitle=null;
-
-	private SAPNoteDbAdapter mDbHelper;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		
-		bAttemptToSniffNoteFromHTTP=false;
 
 		// if no user is setup, redirect to setup
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
@@ -83,29 +71,21 @@ public class SAPNoteView extends Activity {
 		if (sapuser == null) {
 			Toast
 					.makeText(
-							SAPNoteView.this,
+							SAPNoteSearch.this,
 							"Please provide your SAP service marketplace user before continuing",
 							Toast.LENGTH_LONG).show();
 			Intent i = new Intent(this, SAPNoteSetup.class);
 			startActivity(i);
 		}
 
-		// open database of favorites
-		mDbHelper = new SAPNoteDbAdapter(this);
-		//mDbHelper.open();
-
 		// needed in order to get progress bar
 		getWindow().requestFeature(Window.FEATURE_PROGRESS);
 
 		
-		setContentView(R.layout.activity_view);		
+		setContentView(R.layout.activity_search);		
 		UIFrameworkSetup();
 
-
-		// set up view
-		txtNote = (EditText) findViewById(R.id.txtNote);
 		webview = (WebView) findViewById(R.id.webview);
-
 		webview.setWebViewClient(new SAPNoteViewClient());
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.getSettings().setBuiltInZoomControls(true);
@@ -114,54 +94,10 @@ public class SAPNoteView extends Activity {
 		// progress bar in title
 		webview.setWebChromeClient(new WebChromeClient() {
 			public void onProgressChanged(WebView view, int progress) {
-				SAPNoteView.this.setProgress(progress * 100);
+				SAPNoteSearch.this.setProgress(progress * 100);
 			}
 		});
-
-		webview.setDownloadListener(new DownloadHandler());
-
-
-
-		// setup button
-		bView = (Button) findViewById(R.id.bView);
-
-		bView.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				bAttemptToSniffNoteFromHTTP=false;
-				String strNote = ((Editable) txtNote.getText()).toString();
-				viewNote(strNote);
-			}
-		});
-
-		Intent intent = getIntent();
-		Uri url = intent.getData();
-		Bundle extras = intent.getExtras();
-		
-		// check if we got an intent parameter from our application
-		if (extras != null && extras.containsKey(KEY_ID)) {
-			long sapNoteNr = extras.getLong(KEY_ID);
-			txtNote.setText(sapNoteNr + "");
-			viewNote(sapNoteNr + "");
-			
-		}else {
-			//check if we got called through our url-based intent-filter
-			//for example from chrome to phone
-			if(url!=null){
-				String noteNumber= url.getQueryParameter("numm");
-				if(noteNumber!=null){
-					txtNote.setText(noteNumber);
-					viewNote(noteNumber);
-				}else {
-					bAttemptToSniffNoteFromHTTP=true;
-					viewNoteInternal(url.toString());
-				}
-			}
-		}
-		
-
-
+		viewSearch();
 	}
 	
 	
@@ -181,21 +117,19 @@ public class SAPNoteView extends Activity {
 		ImageButton bSearch = (ImageButton) thisActivity.findViewById(R.id.title_search_button);
 		bSearch.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				Intent i = new Intent(thisActivity, SAPNoteView.class);
+				Intent i = new Intent(thisActivity, SAPNoteSearch.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				thisActivity.startActivity(i);
 			}
 		});
 	}	
-	private void viewNote (String strNote){
-		viewNoteInternal("http://service.sap.com/sap/support/notes/" + strNote);
-		//viewNoteInternal("http://service.sap.com/sap/support/notes/print/" + strNote);
+	private void viewSearch(){
+		viewNoteInternal("https://websmp204.sap-ag.de/xsearch");
 	}
 
 	private void viewNoteInternal(String strURL) {
-		hideKeyboard();
 		// give a short message to user
-		Toast.makeText(SAPNoteView.this, "Loading " + strURL,Toast.LENGTH_LONG).show();
+		Toast.makeText(SAPNoteSearch.this, "Loading " + strURL,Toast.LENGTH_LONG).show();
 		DefaultHttpClient httpclient=null;
 		try {
 	        httpclient = new DefaultHttpClient();
@@ -221,33 +155,17 @@ public class SAPNoteView extends Activity {
 	        
 	        //handle different content types
 	        if(contentType==null || !contentType.startsWith("text")){
-	        	Toast.makeText(SAPNoteView.this, "Downloads are not supported in current version. Content-type:" + contentType,Toast.LENGTH_LONG).show();
+	        	Toast.makeText(SAPNoteSearch.this, "Downloads are not supported in current version. Content-type:" + contentType,Toast.LENGTH_LONG).show();
 	        	return;
 	        }
 	        
 	        InputStream is =entity.getContent();
 	        String htmlOrg = convertStreamToString(is);
 	        
-	        //if we followed a link, we need to sniff the note number from the html
-	        if(bAttemptToSniffNoteFromHTTP){
-	        	String sapNoteNr= getNoteNrFromString(htmlOrg);
-	        	if(sapNoteNr!=null){
-	        		txtNote.setText(sapNoteNr);
-	        	}else {
-	        		Toast.makeText(SAPNoteView.this, "Could not find SAP Note number from content. Save to favorites will not be possible",Toast.LENGTH_LONG).show();
-	        	}
-	        	
-	        }
 	        
-	        //try to read the name of the note
-	        strNoteTitle= getNoteTitleFromString(htmlOrg);
-	        if(strNoteTitle==null){
-	        	strNoteTitle = "Note " + ((Editable) txtNote.getText()).toString();
-	        }
-	        strNoteTitle.replaceAll("&amp;", "&");
 	        
 	        //background-color tricks seems to work in chrome, but not on android
-	        htmlOrg = htmlOrg.replaceAll("\\<div id=\"oc_1\".*?\\>","<div id=\"oc_1\" ct=\"SC\" class=\"urScrl\" style=\"background-color:#FFFFFF;\" >");
+	        //htmlOrg = htmlOrg.replaceAll("\\<div id=\"oc_1\".*?\\>","<div id=\"oc_1\" ct=\"SC\" class=\"urScrl\" style=\"background-color:#FFFFFF;\" >");
 	        //replace for knowledge base articles
 	        //htmlOrg = htmlOrg.replaceAll("\\<div id=\"Display_Container\".*?\\>","<div id=\"Display_Container\" ct=\"SC\" class=\"urScrl\" style=\"background-color:#FFFFFF;\" >");
 	        
@@ -261,7 +179,7 @@ public class SAPNoteView extends Activity {
 	            entity.consumeContent();
 	        }
 		}catch (Exception e){
-			Toast.makeText(SAPNoteView.this, "Httpclient failed, attempting backup solution",Toast.LENGTH_LONG).show();
+			Toast.makeText(SAPNoteSearch.this, "Httpclient failed, attempting backup solution",Toast.LENGTH_LONG).show();
 			webview.loadUrl(strURL);
 			Log.e(this.getClass().getName(),"Error during httpclient",e);
 		}finally{
@@ -275,94 +193,8 @@ public class SAPNoteView extends Activity {
 
 	}
 	
-	private void hideKeyboard(){
-		// close soft keyboard
-		InputMethodManager inputManager = (InputMethodManager) SAPNoteView.this
-				.getSystemService(Context.INPUT_METHOD_SERVICE);
-		inputManager.hideSoftInputFromWindow(txtNote.getWindowToken(), 0);
-		
-		/*inputManager.hideSoftInputFromWindow(txtNote.getWindowToken(),
-				InputMethodManager.HIDE);
-		*/
-	}
 
 
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.menu_view, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menuAdd:
-			String strNote = ((Editable) txtNote.getText()).toString();
-			addNoteToFavorites(strNote);
-			return true;
-		case R.id.menuSetup:
-			hideKeyboard();
-			Intent i = new Intent(this, SAPNoteSetup.class);
-			startActivity(i);
-			return true;
-		case R.id.menuShare:
-			String strNote2 = ((Editable) txtNote.getText()).toString();
-			String shareTxt= "http://service.sap.com/sap/support/notes/" + strNote2 + " "+ strNoteTitle;
-			Intent shareIntent = new Intent();
-			shareIntent.setAction(Intent.ACTION_SEND);
-			shareIntent.setType("text/plain");
-			shareIntent.putExtra(Intent.EXTRA_TEXT, shareTxt);
-			
-			/* Send it off to the Activity-Chooser */  
-			startActivity(Intent.createChooser(shareIntent, "Share note.."));  
-			return true;
-		case R.id.menuFavorites:
-			hideKeyboard();
-			Intent i3 = new Intent(this, SAPNoteList.class);
-			startActivity(i3);
-
-			return true;
-		default:
-			return super.onMenuItemSelected(featureId, item);
-		}
-
-	}
-	
-	private String getNoteNrFromString(String html){
-		//find the text in the title element
-		Pattern p= Pattern.compile("(?s)<title>(.*)</title>");
-		Matcher m= p.matcher(html);
-		if (m.find()){
-			String title = m.group(1).trim();
-			StringTokenizer tokenizer = new StringTokenizer (title," ");
-			if(tokenizer.countTokens()>=2){
-				tokenizer.nextToken();
-				String noteNr= tokenizer.nextToken();
-				//System.out.println(noteNr);
-				return noteNr;
-			}
-		}
-		return null;
-	}
-	
-	
-	private String getNoteTitleFromString(String html){
-		//find the text in the title element
-		Pattern p= Pattern.compile("<span id=header_data .+?>(.+?)</span>");
-		Matcher m= p.matcher(html);
-		if (m.find()){
-			String title = m.group(1).trim();
-			if(title.equals("")){
-				return null;
-			}else {
-				return title;
-			}
-			
-		}
-		return null;
-	}	
 	
 	private static String convertStreamToString(InputStream is) {
         /*
@@ -405,35 +237,6 @@ public class SAPNoteView extends Activity {
 		super.onConfigurationChanged(newConfig);
 	}
 
-	private void addNoteToFavorites(String strNote) {
-		try {
-			long lngNote = Long.parseLong(strNote);
-			//strNoteTitle is set during load
-			long lngRet =mDbHelper.createNote(lngNote, strNoteTitle);
-			if (lngRet!=-1){
-				Toast
-				.makeText(
-						SAPNoteView.this,
-						"Added note "+ lngNote + " to favorites",
-						Toast.LENGTH_SHORT).show();
-			}else {
-				Toast
-				.makeText(
-						SAPNoteView.this,
-						"Failed to add " + lngNote + " to favorites",
-						Toast.LENGTH_SHORT).show();
-			}
-
-		} catch (NumberFormatException e) {
-			Toast
-					.makeText(
-							SAPNoteView.this,
-							"Text field must contain a note number before it is added to favorites",
-							Toast.LENGTH_LONG).show();
-		}
-		
-	}
-
 	private class SAPNoteViewClient extends WebViewClient {
 		private boolean bHaveTriedManual=false;
 		@Override
@@ -447,7 +250,6 @@ public class SAPNoteView extends Activity {
 				//this so that we can fix the scroll problems and get the note title
 				if(bHaveTriedManual==false){
 					bHaveTriedManual=true;
-					bAttemptToSniffNoteFromHTTP=true;
 					viewNoteInternal(url);
 					return true;
 				}
@@ -500,7 +302,7 @@ public class SAPNoteView extends Activity {
 		public void onReceivedError(WebView view, int errorCode,
 				String description, String failingUrl) {
 			bHaveTriedManual=false;
-			Toast.makeText(SAPNoteView.this,
+			Toast.makeText(SAPNoteSearch.this,
 					"An error has occured: " + description, Toast.LENGTH_LONG)
 					.show();
 		}
@@ -537,79 +339,6 @@ public class SAPNoteView extends Activity {
 		
 		
 	}
-
-	/**
-	 * Code taken from android browser
-	 * http://android.git.kernel.org/?p=platform/
-	 * packages/apps/Browser.git;a=tree
-	 * ;f=src/com/android/browser;h=a9a204e54222376c5b5159023d06cb7238c738de
-	 * ;hb=HEAD
-	 * 
-	 * @author dagfinn.parnas
-	 * 
-	 */
-	private class DownloadHandler implements DownloadListener {
-
-		/**
-		 * Notify the host application a download should be done, or that the
-		 * data should be streamed if a streaming viewer is available.
-		 * 
-		 * @param url
-		 *            The full url to the content that should be downloaded
-		 * @param contentDisposition
-		 *            Content-disposition http header, if present.
-		 * @param mimetype
-		 *            The mimetype of the content reported by the server
-		 * @param contentLength
-		 *            The file size reported by the server
-		 */
-		public void onDownloadStart(String url, String userAgent,
-				String contentDisposition, String mimetype, long contentLength) {
-			Log.i(this.getClass().getName(), "Download to URL:" + url);
-			// if we're dealing wih A/V content that's not explicitly marked
-			// for download, check if it's streamable.
-			if (contentDisposition == null
-					|| !contentDisposition.regionMatches(true, 0, "attachment",
-							0, 10)) {
-				// query the package manager to see if there's a registered
-				// handler
-				// that matches.
-				Intent intent = new Intent(Intent.ACTION_VIEW);
-				intent.setDataAndType(Uri.parse(url), mimetype);
-				ResolveInfo info = getPackageManager().resolveActivity(intent,
-						PackageManager.MATCH_DEFAULT_ONLY);
-				if (info != null) {
-					ComponentName myName = getComponentName();
-					// If we resolved to ourselves, we don't want to attempt to
-					// load the url only to try and download it again.
-					if (!myName.getPackageName().equals(
-							info.activityInfo.packageName)
-							|| !myName.getClassName().equals(
-									info.activityInfo.name)) {
-						// someone (other than us) knows how to handle this mime
-						// type with this scheme, don't download.
-						try {
-							startActivity(intent);
-							return;
-						} catch (ActivityNotFoundException ex) {
-							Log.w(this.getClass().getName(),
-									"activity not found for " + mimetype
-											+ " over "
-											+ Uri.parse(url).getScheme(), ex);
-						}
-					}
-				}
-			}
-			// failed to start activity for file
-			Toast.makeText(
-					SAPNoteView.this,
-					"Found no activities that could handle streaming files with mime type "
-							+ mimetype, Toast.LENGTH_LONG).show();
-
-		}
-
-	}
-
 	/**
 	 * Handle the back key specifically
 	 */

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="app_name_view">View note</string>
+	<string name="app_name_setup">Setup</string>
+	<string name="app_name_list">Favorite</string>
+	<string name="app_name_home">Home</string>	
+	<string name="app_name_search">Search</string>	
 	<string name="app_name">SAP Note Viewer</string>
-	<string name="app_name_setup">SAP Note Viewer Setup</string>
-	<string name="app_name_list">SAP Note Viewer</string>
-	<string name="app_name_home">SAP Note Viewer</string>	
 
 	<string name="title_text">Support note viewer</string>
 	<string name="footer_text">Unofficial app brought to you by the</string>

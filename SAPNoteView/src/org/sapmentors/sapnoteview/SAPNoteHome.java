@@ -44,6 +44,14 @@ public class SAPNoteHome extends Activity {
 			}
 		});	
 		
+		Button bSearch = (Button) findViewById(R.id.home_btn_map);
+		bSearch.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				Intent i = new Intent(thisActivity, SAPNoteSearch.class);
+				startActivity(i);
+			}
+		});			
+		
 		Button bSetup = (Button) findViewById(R.id.home_btn_vendors);
 		bSetup.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
