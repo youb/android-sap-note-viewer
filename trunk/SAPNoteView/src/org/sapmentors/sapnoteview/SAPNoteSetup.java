@@ -1,5 +1,6 @@
 package org.sapmentors.sapnoteview;
 
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -9,8 +10,13 @@ import android.text.Editable;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class SAPNoteSetup extends Activity {
@@ -23,8 +29,11 @@ public class SAPNoteSetup extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.setup);
+		setContentView(R.layout.activity_setup);
 
+		UIFrameworkSetup();
+		
+	
 		// set up view
 		txtUsername = (EditText) findViewById(R.id.txtUsername);
 		txtPassword = (EditText) findViewById(R.id.txtPassword);
@@ -39,10 +48,34 @@ public class SAPNoteSetup extends Activity {
 		if(sappwd!=null){
 			txtPassword.setText(sappwd);
 		}
-		
-
 	}
 
+	private void UIFrameworkSetup(){
+		((TextView) findViewById(R.id.title_text)).setText(getTitle());
+		
+		final Activity thisActivity = this;
+		ImageButton bHome = (ImageButton) this.findViewById(R.id.title_home_button);
+		bHome.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				saveSettings();
+				Intent i = new Intent(thisActivity, SAPNoteHome.class);
+				i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				thisActivity.startActivity(i);
+			}
+		});
+		
+		ImageButton bSearch = (ImageButton) thisActivity.findViewById(R.id.title_search_button);
+		bSearch.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				saveSettings();
+				Intent i = new Intent(thisActivity, SAPNoteView.class);
+				i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				thisActivity.startActivity(i);
+			}
+		});
+	}
+	
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -53,8 +86,6 @@ public class SAPNoteSetup extends Activity {
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		//always save settings
-
-	
 		switch (item.getItemId()) {
 		case R.id.menuView:
 			saveSettings();
