@@ -3,7 +3,7 @@
       package="org.sapmentors.sapnoteview"
       android:versionCode="10"
       android:versionName="1.20">
-    <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="false">
+    <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true">
         <activity android:name=".SAPNoteView"
                   android:label="@string/app_name"
                   android:configChanges="orientation"
@@ -54,14 +54,19 @@
                   android:label="@string/app_name_setup">
         </activity>
         <activity android:name=".SAPNoteList"
-                  android:label="@string/app_name_list">
+                  android:label="@string/app_name_list">                
+        </activity>  
+        <activity android:name=".SAPNoteHome"
+                  android:label="@string/app_name_home"
+                  android:theme="@style/Theme.SAPAndroid">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>                  
-        </activity>        
+        </activity>  
+              
     </application>
-    <uses-sdk android:minSdkVersion="3"/>
+    <uses-sdk android:minSdkVersion="5"/>
 
 
 <uses-permission android:name="android.permission.INTERNET"></uses-permission>
