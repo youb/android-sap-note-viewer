@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Home adapted from http://code.google.com/p/iosched/source/browse/trunk/res/layout/activity_home.xml -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/home_root"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+<!-- header -->
+    <LinearLayout style="@style/TitleBar">
+        <ImageView style="@style/TitleBarLogo"
+            android:src="@drawable/title_logo_sap" />
+
+        <TextView
+       	 style="@style/TitleBarText" 
+            android:text="@string/title_text"/>
+            
+        <View style="@style/TitleBarSpring" />
+
+        <ImageView style="@style/TitleBarSeparator" />
+        
+        <ImageButton android:id="@+id/top_btnsearch" 
+        	style="@style/TitleBarAction"
+            android:src="@drawable/ic_title_search"/>
+                        
+    </LinearLayout>
+<!-- content -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:padding="6dip">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <Button android:id="@+id/home_btn_notes"
+                style="@style/HomeButton"
+                android:text="@string/btn_notes"
+                android:drawableTop="@drawable/home_btn_office_hours"/>
+                
+            <Button android:id="@+id/home_btn_starred"
+                style="@style/HomeButton"
+                android:text="@string/btn_starred"
+                android:drawableTop="@drawable/home_btn_starred"/>                
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+            <Button android:id="@+id/home_btn_map"
+                style="@style/HomeButton"
+                android:text="@string/btn_map"
+                android:drawableTop="@drawable/home_btn_map"/>
+                
+            <Button android:id="@+id/home_btn_vendors"
+                style="@style/HomeButton"
+                android:text="@string/btn_vendors"
+                android:drawableTop="@drawable/home_btn_sandbox"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/footer"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/footer_height"
+        android:orientation="horizontal"
+        android:background="#eee"
+>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1">
+	        <TextView
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:textSize="@dimen/text_size_small"
+	            android:text="@string/footer_text"/>
+	
+	        <ImageView style="@style/TitleBarLogo"
+	            android:src="@drawable/logo_sapmentors" />
+        </LinearLayout>            
+    </LinearLayout>
+</LinearLayout>

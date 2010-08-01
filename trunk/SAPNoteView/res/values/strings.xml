@@ -3,6 +3,10 @@
 	<string name="app_name">SAP Note Viewer</string>
 	<string name="app_name_setup">SAP Note Viewer Setup</string>
 	<string name="app_name_list">SAP Note Viewer</string>
+	<string name="app_name_home">SAP Note Viewer</string>	
+
+	<string name="title_text">Support note viewer</string>
+	<string name="footer_text">Unofficial app brought to you by the</string>
 
 	<string name="bView">View</string>
 	<string name="lblNote">SAP Note:</string>
@@ -27,4 +31,9 @@
 	<string name="contextMenuDelete">Delete</string>
 
 	<string name="listNoNotes">No Notes have been stored. Select View Notes from menu to continue</string>
+	
+    <string name="btn_map">Search</string>
+    <string name="btn_starred">Favorites</string>
+    <string name="btn_vendors">Sharing</string>
+    <string name="btn_notes">View note</string>
 </resources>
