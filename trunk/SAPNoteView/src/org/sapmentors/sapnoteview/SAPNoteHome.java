@@ -68,12 +68,14 @@ public class SAPNoteHome extends Activity {
 				Intent i = new Intent(thisActivity, SAPNoteSetup.class);
 				startActivity(i);
 			}
+		});	
+		ImageButton bTopSearch = (ImageButton) findViewById(R.id.top_btnsearch);
+		bTopSearch.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				onSearchRequested();
+			}
 		});			
-		
-	}
-	
-	public void sayHello(ImageButton b)	{
-		
+
 		
 	}
 

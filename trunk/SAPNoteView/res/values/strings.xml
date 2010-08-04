@@ -38,4 +38,8 @@
     <string name="btn_starred">Favorites</string>
     <string name="btn_vendors">Sharing</string>
     <string name="btn_notes">View note</string>
+    
+	<string name="title_search">Search</string>
+    <string name="search_label">SAP Note Favorites</string>
+    <string name="search_hint">Search favorites</string>    
 </resources>

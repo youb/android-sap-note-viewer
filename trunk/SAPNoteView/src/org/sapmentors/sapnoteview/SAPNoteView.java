@@ -22,6 +22,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultRedirectHandler;
 import org.apache.http.protocol.HttpContext;
+import org.sapmentors.sapnoteview.db.SAPNoteDbAdapter;
 
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
@@ -107,7 +108,7 @@ public class SAPNoteView extends Activity {
 		
 		//anonymous tracker
 		tracker = GoogleAnalyticsTracker.getInstance();
-	    tracker.start(Analytics.ANALYTICS_ID, 60,this);
+	    tracker.start(Analytics.ANALYTICS_ID, 30,this);
 	    tracker.trackPageView("/view");
 
 		// set up view

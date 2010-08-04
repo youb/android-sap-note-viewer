@@ -61,6 +61,8 @@
 					<data android:host="websmp233.sap-ag.de" android:scheme="https"></data>
 					
 					</intent-filter>
+
+
                    
         </activity>
         <activity android:name=".SAPNoteSetup"
@@ -79,6 +81,33 @@
                    >  
 		</activity>                           
 
+       <activity
+            android:name=".NoteQuickSearchActivity"
+            android:theme="@style/Theme.SAPAndroid">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <data android:mimeType="vnd.android.cursor.dir/vnd.sapmentors.sapnote" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".QuickSearchActivity"
+            android:theme="@style/Theme.SAPAndroid"
+            android:label="@string/title_search"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>       
+            <meta-data android:name="android.app.searchable" android:resource="@xml/searchable" />
+        </activity>
+
+        <meta-data android:name="android.app.default_searchable" android:value=".QuickSearchActivity" />
+
+        <provider
+            android:name=".db.SAPNoteProvider"
+            android:authorities="org.sapmentors.sapnoteview.noteprovider"
+         />
               
     </application>
     <uses-sdk android:minSdkVersion="3"/>
@@ -86,4 +115,6 @@
 
 <uses-permission android:name="android.permission.INTERNET"></uses-permission>
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<!-- Needed for Google analytics -->
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 </manifest> 
