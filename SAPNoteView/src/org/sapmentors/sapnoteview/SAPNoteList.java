@@ -1,5 +1,8 @@
 package org.sapmentors.sapnoteview;
 
+import org.sapmentors.sapnoteview.db.SAPNoteDbAdapter;
+import org.sapmentors.sapnoteview.db.SAPNoteProvider;
+
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 import android.app.Activity;
@@ -85,7 +88,7 @@ public class SAPNoteList extends ListActivity {
 
 		// Create an array to specify the fields we want to display in the list
 		// (only TITLE)
-		String[] from = new String[] { SAPNoteDbAdapter.KEY_TITLE };
+		String[] from = new String[] { SAPNoteProvider.KEY_TITLE };
 
 		// and an array of the fields we want to bind those fields to (in this
 		// case just text1)
