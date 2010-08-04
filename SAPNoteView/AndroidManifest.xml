@@ -61,8 +61,11 @@
 					<data android:host="websmp233.sap-ag.de" android:scheme="https"></data>
 					
 					</intent-filter>
-
-
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>  
+			<meta-data android:name="android.app.searchable" android:resource="@xml/searchable" />
                    
         </activity>
         <activity android:name=".SAPNoteSetup"
@@ -102,7 +105,7 @@
             <meta-data android:name="android.app.searchable" android:resource="@xml/searchable" />
         </activity>
 
-        <meta-data android:name="android.app.default_searchable" android:value=".QuickSearchActivity" />
+        <meta-data android:name="android.app.default_searchable" android:value=".SAPNoteView" />
 
         <provider
             android:name=".db.SAPNoteProvider"

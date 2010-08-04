@@ -145,6 +145,8 @@ public class SAPNoteView extends Activity {
 		});
 
 		Intent intent = getIntent();
+		String dataString = intent.getDataString();
+
 		Uri url = intent.getData();
 		Bundle extras = intent.getExtras();
 		
@@ -153,18 +155,26 @@ public class SAPNoteView extends Activity {
 			long sapNoteNr = extras.getLong(KEY_ID);
 			txtNote.setText(sapNoteNr + "");
 			viewNote(sapNoteNr + "");
-			
-		}else {
-			//check if we got called through our url-based intent-filter
-			//for example from chrome to phone
-			if(url!=null){
-				String noteNumber= url.getQueryParameter("numm");
-				if(noteNumber!=null){
-					txtNote.setText(noteNumber);
-					viewNote(noteNumber);
-				}else {
-					bAttemptToSniffNoteFromHTTP=true;
-					viewNoteInternal(url.toString());
+		//hack to check if the dataString is pure numeric
+		}else if (dataString!=null){
+			try {
+				long sapNoteNr=Long.parseLong(dataString);
+				txtNote.setText(sapNoteNr + "");
+				viewNote(sapNoteNr + "");
+			}catch (NumberFormatException e) {
+				//if it is not a number from the quick search it is a url
+				//check if we got called through our url-based intent-filter
+				//for example from chrome to phone
+				//TODO: Test if chrome to phone works
+				if(url!=null){
+					String noteNumber= url.getQueryParameter("numm");
+					if(noteNumber!=null){
+						txtNote.setText(noteNumber);
+						viewNote(noteNumber);
+					}else {
+						bAttemptToSniffNoteFromHTTP=true;
+						viewNoteInternal(url.toString());
+					}
 				}
 			}
 		}

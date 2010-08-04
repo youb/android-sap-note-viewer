@@ -47,7 +47,7 @@ public class SAPNoteProvider extends ContentProvider {
                 KEY_TITLE + " AS " + SearchManager.SUGGEST_COLUMN_TEXT_1);
     	NOTE_PROJECTION_MAP.put(KEY_NOTENR,KEY_NOTENR);
     	NOTE_PROJECTION_MAP.put(SearchManager.SUGGEST_COLUMN_INTENT_DATA,
-                KEY_NOTENR + " AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA );
+                KEY_NOTENR + " AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA);
     }	    
 
     private static class DatabaseHelper extends SQLiteOpenHelper {
