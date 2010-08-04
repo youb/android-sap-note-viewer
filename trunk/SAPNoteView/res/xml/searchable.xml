@@ -21,4 +21,3 @@
     android:searchSuggestSelection="suggest_text_1 LIKE ?"
     android:searchSuggestIntentAction="android.Intent.action.VIEW"
      />
-     <!-- " -->
