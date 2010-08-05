@@ -27,6 +27,7 @@
 	<string name="menuShare">Share note</string>
 	<string name="menuFavorites">Favorites</string>
 	<string name="menuClear">Clear settings</string>
+	<string name="menuSave">Save</string>
 	
 	<string name="contextMenuView">View</string>
 	<string name="contextMenuShare">Share</string>

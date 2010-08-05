@@ -3,13 +3,7 @@
     <item android:id="@+id/menuAdd"
           android:title="@string/menuAdd"
           android:icon="@android:drawable/ic_menu_add" />
-    <item android:id="@+id/menuFavorites"
-          android:title="@string/menuFavorites" 
-          android:icon="@android:drawable/ic_menu_slideshow" />
     <item android:id="@+id/menuShare"
           android:title="@string/menuShare"
           android:icon="@android:drawable/ic_menu_share"  />
-    <item android:id="@+id/menuSetup"
-          android:title="@string/menuSetup"
-          android:icon="@android:drawable/ic_menu_preferences"  />
 </menu>

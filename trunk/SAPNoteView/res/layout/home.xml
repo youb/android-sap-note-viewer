@@ -97,7 +97,8 @@
 	            android:textSize="@dimen/text_size_small"
 	            android:text="@string/footer_text"/>
 	
-	        <ImageView style="@style/TitleBarLogo"
+	        <ImageView android:id="@+id/footer_logo"
+	        	style="@style/TitleBarLogo"
 	            android:src="@drawable/logo_sapmentors" />
         </LinearLayout>            
     </LinearLayout>
