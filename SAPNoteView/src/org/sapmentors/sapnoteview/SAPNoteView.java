@@ -321,11 +321,6 @@ public class SAPNoteView extends Activity {
 			String strNote = ((Editable) txtNote.getText()).toString();
 			addNoteToFavorites(strNote);
 			return true;
-		case R.id.menuSetup:
-			hideKeyboard();
-			Intent i = new Intent(this, SAPNoteSetup.class);
-			startActivity(i);
-			return true;
 		case R.id.menuShare:
 			String strNote2 = ((Editable) txtNote.getText()).toString();
 			String shareTxt= "http://service.sap.com/sap/support/notes/" + strNote2 + " "+ strNoteTitle;
@@ -336,12 +331,6 @@ public class SAPNoteView extends Activity {
 			
 			/* Send it off to the Activity-Chooser */  
 			startActivity(Intent.createChooser(shareIntent, "Share note.."));  
-			return true;
-		case R.id.menuFavorites:
-			hideKeyboard();
-			Intent i3 = new Intent(this, SAPNoteList.class);
-			startActivity(i3);
-
 			return true;
 		default:
 			return super.onMenuItemSelected(featureId, item);

@@ -6,6 +6,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.Menu;
@@ -17,6 +19,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 public class SAPNoteHome extends Activity {
@@ -33,7 +36,9 @@ public class SAPNoteHome extends Activity {
 		tracker = GoogleAnalyticsTracker.getInstance();
 	    tracker.start(Analytics.ANALYTICS_ID, 60,this);
 	    tracker.trackPageView("/home");
-		
+	    
+		tracker.trackEvent("System", "Android OS", Build.VERSION.RELEASE,0 );
+	    
 		
 		final Activity thisActivity=this;
 		
@@ -69,38 +74,26 @@ public class SAPNoteHome extends Activity {
 				startActivity(i);
 			}
 		});	
+		
 		ImageButton bTopSearch = (ImageButton) findViewById(R.id.top_btnsearch);
 		bTopSearch.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				onSearchRequested();
 			}
-		});			
+		});
+		
+		// SAP Mentors
+		ImageView bMentors = (ImageView) findViewById(R.id.footer_logo);
+		bMentors.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("http://sapmentors.sap.com"));
+				tracker.trackPageView("/sapmentors");
+				startActivity(i);
+			}
+		});	
 
 		
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.menu_setup, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menuView:
-			Intent i = new Intent(this, SAPNoteView.class);
-			startActivity(i);
-			return true;
-		case R.id.menuFavorites:
-			Intent i2 = new Intent(this, SAPNoteList.class);
-			startActivity(i2);
-			return true;
-		default:
-			return super.onMenuItemSelected(featureId, item);
-		}
-
-	}	
 
 }

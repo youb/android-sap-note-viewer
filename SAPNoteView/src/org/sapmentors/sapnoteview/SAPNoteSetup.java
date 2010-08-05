@@ -92,15 +92,10 @@ public class SAPNoteSetup extends Activity {
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		//always save settings
 		switch (item.getItemId()) {
-		case R.id.menuView:
+		case R.id.menuSave:
 			saveSettings();
-			Intent i = new Intent(this, SAPNoteView.class);
+			Intent i = new Intent(this, SAPNoteHome.class);
 			startActivity(i);
-			return true;
-		case R.id.menuFavorites:
-			saveSettings();
-			Intent i2 = new Intent(this, SAPNoteList.class);
-			startActivity(i2);
 			return true;
 		case R.id.menuClear:
 			clearSettings();

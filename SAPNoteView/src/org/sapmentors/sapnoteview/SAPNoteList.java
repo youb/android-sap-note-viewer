@@ -102,32 +102,6 @@ public class SAPNoteList extends ListActivity {
 
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.menu_list, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menuView:
-			Intent i1 = new Intent(this, SAPNoteView.class);
-			startActivity(i1);
-			return true;
-		case R.id.menuSetup:
-			// setup
-			Intent i2 = new Intent(this, SAPNoteSetup.class);
-			startActivity(i2);
-
-			return true;
-			
-		
-		default:
-			return super.onMenuItemSelected(featureId, item);
-		}
-	}
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
