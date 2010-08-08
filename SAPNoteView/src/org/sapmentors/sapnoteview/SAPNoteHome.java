@@ -37,7 +37,7 @@ public class SAPNoteHome extends Activity {
 	    tracker.start(Analytics.ANALYTICS_ID, 60,this);
 	    tracker.trackPageView("/home");
 	    
-		tracker.trackEvent("System", "Android OS", Build.VERSION.RELEASE,0 );
+		tracker.trackEvent("System", "AndroidOS", Build.VERSION.RELEASE,0 );
 	    
 		
 		final Activity thisActivity=this;
@@ -75,7 +75,7 @@ public class SAPNoteHome extends Activity {
 			}
 		});	
 		
-		ImageButton bTopSearch = (ImageButton) findViewById(R.id.top_btnsearch);
+		ImageButton bTopSearch = (ImageButton) findViewById(R.id.title_search_button);
 		bTopSearch.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				onSearchRequested();

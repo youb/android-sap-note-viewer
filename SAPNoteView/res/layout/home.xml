@@ -20,7 +20,8 @@
 
         <ImageView style="@style/TitleBarSeparator" />
         
-        <ImageButton android:id="@+id/top_btnsearch" 
+        <ImageButton 
+        	android:id="@id/title_search_button" 
         	style="@style/TitleBarAction"
             android:src="@drawable/ic_title_search"/>
                         

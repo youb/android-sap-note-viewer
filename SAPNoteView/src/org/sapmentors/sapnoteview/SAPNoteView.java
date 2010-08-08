@@ -1,6 +1,5 @@
 package org.sapmentors.sapnoteview;
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +18,7 @@ import org.apache.http.ProtocolException;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultRedirectHandler;
 import org.apache.http.protocol.HttpContext;
@@ -36,6 +36,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
@@ -67,9 +68,9 @@ public class SAPNoteView extends Activity {
 	private WebView webview;
 	private Button bView;
 	private EditText txtNote;
-	
-	private boolean bAttemptToSniffNoteFromHTTP=false;
-	private String strNoteTitle=null;
+
+	private boolean bAttemptToSniffNoteFromHTTP = false;
+	private String strNoteTitle = null;
 
 	private SAPNoteDbAdapter mDbHelper;
 
@@ -79,12 +80,11 @@ public class SAPNoteView extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		
-		bAttemptToSniffNoteFromHTTP=false;
+		bAttemptToSniffNoteFromHTTP = false;
 
 		// if no user is setup, redirect to setup
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		String sapuser = settings.getString("sapuser", null);
+		String sapuser = settings.getString(Preferences.KEY_SAP_USERNAME, null);
 		if (sapuser == null) {
 			Toast
 					.makeText(
@@ -97,19 +97,16 @@ public class SAPNoteView extends Activity {
 
 		// open database of favorites
 		mDbHelper = new SAPNoteDbAdapter(this);
-		//mDbHelper.open();
+		// mDbHelper.open();
 
-		// needed in order to get progress bar
-		getWindow().requestFeature(Window.FEATURE_PROGRESS);
 
-		
-		setContentView(R.layout.activity_view);		
+		setContentView(R.layout.activity_view);
 		UIFrameworkSetup();
-		
-		//anonymous tracker
+
+		// anonymous tracker
 		tracker = GoogleAnalyticsTracker.getInstance();
-	    tracker.start(Analytics.ANALYTICS_ID, 30,this);
-	    tracker.trackPageView("/view");
+		tracker.start(Analytics.ANALYTICS_ID, 30, this);
+		tracker.trackPageView("/view");
 
 		// set up view
 		txtNote = (EditText) findViewById(R.id.txtNote);
@@ -119,76 +116,66 @@ public class SAPNoteView extends Activity {
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.getSettings().setBuiltInZoomControls(true);
 		webview.getSettings().setSupportZoom(true);
-		//webview.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
-		// progress bar in title
-		webview.setWebChromeClient(new WebChromeClient() {
-			public void onProgressChanged(WebView view, int progress) {
-				SAPNoteView.this.setProgress(progress * 100);
-			}
-		});
 
 		webview.setDownloadListener(new DownloadHandler());
 
-
-
-		// setup button
+		// View note button
 		bView = (Button) findViewById(R.id.bView);
-
 		bView.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
-				bAttemptToSniffNoteFromHTTP=false;
+				bAttemptToSniffNoteFromHTTP = false;
 				String strNote = ((Editable) txtNote.getText()).toString();
 				viewNote(strNote);
 			}
 		});
 
+		//Check if this intent was called with parameters
 		Intent intent = getIntent();
 		String dataString = intent.getDataString();
 
 		Uri url = intent.getData();
 		Bundle extras = intent.getExtras();
-		
+
 		// check if we got an intent parameter from our application
 		if (extras != null && extras.containsKey(KEY_ID)) {
 			long sapNoteNr = extras.getLong(KEY_ID);
 			txtNote.setText(sapNoteNr + "");
 			viewNote(sapNoteNr + "");
-		//hack to check if the dataString is pure numeric
-		}else if (dataString!=null){
+			// hack to check if the dataString is pure numeric
+		} else if (dataString != null) {
 			try {
-				long sapNoteNr=Long.parseLong(dataString);
+				long sapNoteNr = Long.parseLong(dataString);
 				txtNote.setText(sapNoteNr + "");
 				viewNote(sapNoteNr + "");
-			}catch (NumberFormatException e) {
-				//if it is not a number from the quick search it is a url
-				//check if we got called through our url-based intent-filter
-				//for example from chrome to phone
-				//TODO: Test if chrome to phone works
-				if(url!=null){
-					String noteNumber= url.getQueryParameter("numm");
-					if(noteNumber!=null){
+			} catch (NumberFormatException e) {
+				// if it is not a number from the quick search it is a url
+				// check if we got called through our url-based intent-filter
+				// for example from chrome to phone
+				// TODO: Test if chrome to phone works
+				if (url != null) {
+					String noteNumber = url.getQueryParameter("numm");
+					if (noteNumber != null) {
 						txtNote.setText(noteNumber);
 						viewNote(noteNumber);
-					}else {
-						bAttemptToSniffNoteFromHTTP=true;
-						viewNoteInternal(url.toString());
+					} else {
+						bAttemptToSniffNoteFromHTTP = true;
+						viewNoteFromURL(url.toString());
 					}
 				}
 			}
 		}
-		
-
 
 	}
-	
-	
-	private void UIFrameworkSetup(){
+	/**
+	 * Setup the UI framework consisting of Home and search button
+	 */
+	private void UIFrameworkSetup() {
 		((TextView) findViewById(R.id.title_text)).setText(getTitle());
-		
+
 		final Activity thisActivity = this;
-		ImageButton bHome = (ImageButton) this.findViewById(R.id.title_home_button);
+		ImageButton bHome = (ImageButton) this
+				.findViewById(R.id.title_home_button);
 		bHome.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(thisActivity, SAPNoteHome.class);
@@ -196,116 +183,196 @@ public class SAPNoteView extends Activity {
 				thisActivity.startActivity(i);
 			}
 		});
-		
-		ImageButton bSearch = (ImageButton) thisActivity.findViewById(R.id.title_search_button);
-		bSearch.setOnClickListener(new OnClickListener() {
+
+		ImageButton bTopSearch = (ImageButton) findViewById(R.id.title_search_button);
+		bTopSearch.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				Intent i = new Intent(thisActivity, SAPNoteView.class);
-				i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				thisActivity.startActivity(i);
+				onSearchRequested();
 			}
 		});
-	}	
-	private void viewNote (String strNote){
-		viewNoteInternal("http://service.sap.com/sap/support/notes/" + strNote);
-		//viewNoteInternal("http://service.sap.com/sap/support/notes/print/" + strNote);
 	}
 
-	private void viewNoteInternal(String strURL) {
+	/**
+	 * Primary method used for viewing a note
+	 * 
+	 * @param strNote The notenumber as a string
+	 */
+	private void viewNote(String strNote) {
+		String strURL = "https://service.sap.com/sap/support/notes/" + strNote;
+		viewNoteFromURL(strURL);
+	}
+
+	/**
+	 * Normally this method should not be called directly, but only via
+	 * viewNote. But for some notes we will sniff the note number after the html
+	 * is downloaded
+	 * 
+	 * @param strURL
+	 */
+	private void viewNoteFromURL(String strURL) {
 		hideKeyboard();
-		// give a short message to user
-		Toast.makeText(SAPNoteView.this, "Loading " + strURL,Toast.LENGTH_LONG).show();
-		DefaultHttpClient httpclient=null;
-		try {
-	        httpclient = new DefaultHttpClient();
-	
-	        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-			String sapuser = settings.getString("sapuser", null);
-			String sappwd = settings.getString("sappwd", null);
-	        
-	        httpclient.getCredentialsProvider().setCredentials(
-	                new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), 
-	                new UsernamePasswordCredentials(sapuser, sappwd));
-	 
-	        CustomRedirectHandler redirectHandler =  new CustomRedirectHandler();
-	        httpclient.setRedirectHandler(redirectHandler);
-	        
-	        HttpGet httpget = new HttpGet(strURL);
-	        
-	        
-	        HttpResponse response = httpclient.execute(httpget);
-	        HttpEntity entity = response.getEntity();
-	        String contentType= entity.getContentType().getValue();
-	        Log.d(this.getClass().getName(), "Response has contentType "+contentType);
-	        
-	        //handle different content types
-	        if(contentType==null || !contentType.startsWith("text")){
-	        	Toast.makeText(SAPNoteView.this, "Downloads are not supported in current version. Content-type:" + contentType,Toast.LENGTH_LONG).show();
-	        	return;
-	        }
-	        
-	        InputStream is =entity.getContent();
-	        String htmlOrg = convertStreamToString(is);
-	        
-	        //if we followed a link, we need to sniff the note number from the html
-	        if(bAttemptToSniffNoteFromHTTP){
-	        	String sapNoteNr= getNoteNrFromString(htmlOrg);
-	        	if(sapNoteNr!=null){
-	        		txtNote.setText(sapNoteNr);
-	        	}else {
-	        		Toast.makeText(SAPNoteView.this, "Could not find SAP Note number from content. Save to favorites will not be possible",Toast.LENGTH_LONG).show();
-	        	}
-	        	
-	        }
-	        
-	        //try to read the name of the note
-	        strNoteTitle= getNoteTitleFromString(htmlOrg);
-	        if(strNoteTitle==null){
-	        	strNoteTitle = "Note " + ((Editable) txtNote.getText()).toString();
-	        }
-	        strNoteTitle.replaceAll("&amp;", "&");
-	        
-	        //background-color tricks seems to work in chrome, but not on android
-	        htmlOrg = htmlOrg.replaceAll("\\<div id=\"oc_1\".*?\\>","<div id=\"oc_1\" ct=\"SC\" class=\"urScrl\" style=\"background-color:#FFFFFF;\" >");
-	        //replace for knowledge base articles
-	        //htmlOrg = htmlOrg.replaceAll("\\<div id=\"Display_Container\".*?\\>","<div id=\"Display_Container\" ct=\"SC\" class=\"urScrl\" style=\"background-color:#FFFFFF;\" >");
-	        
-	        
-	        
-	        String baseURL = "https://" + redirectHandler.getLastServerHost();
-	        webview.loadDataWithBaseURL(baseURL, htmlOrg, "text/html", "utf-8", null);
-	        //webview.loadDataWithBaseURL("https://service.sap.com", htmlOrg, "text/html", "utf-8", null);
-	        
-	        if (entity != null) {
-	            entity.consumeContent();
-	        }
-		}catch (Exception e){
-			Toast.makeText(SAPNoteView.this, "Httpclient failed, attempting backup solution",Toast.LENGTH_LONG).show();
-			webview.loadUrl(strURL);
-			Log.e(this.getClass().getName(),"Error during httpclient",e);
-		}finally{
-		       // When HttpClient instance is no longer needed, 
-	        // shut down the connection manager to ensure
-	        // immediate deallocation of all system resources
-	        if(httpclient!=null){
-	        	httpclient.getConnectionManager().shutdown();
-	        }
+		Toast
+				.makeText(SAPNoteView.this, "Loading " + strURL,
+						Toast.LENGTH_LONG).show();
+		//Create Async task for loading the URL
+		//This task will also update the UI once finished
+		new DownloadNoteTask().execute(strURL);
+
+	}
+//
+	private class DownloadNoteTask extends AsyncTask<String, String, String> {
+		CustomRedirectHandler redirectHandler;
+		String downloadUrl;
+		
+		protected String doInBackground(String... urls) {
+			redirectHandler = new CustomRedirectHandler();
+			downloadUrl=urls[0];
+			return downloadNoteInternal(downloadUrl);
 		}
 
-	}
+		/**
+		 * Progress messages to be displayed in UI thread
+		 * but originting from asynctask 
+		 */
+		protected void onProgressUpdate(String... status) {
+			Toast.makeText(SAPNoteView.this, status[0],
+					Toast.LENGTH_LONG).show();
+		}
+
+		/**
+		 * The main async method.
+		 * Needed since we need to adjust the HTML 
+		 * and sniff out the note name
+		 * 
+		 * @param strURL
+		 * @return
+		 */
+		private String downloadNoteInternal(String strURL) {
+
+			DefaultHttpClient httpclient = null;
+			try {
+				httpclient = new DefaultHttpClient();
+
+				SharedPreferences settings = getSharedPreferences(Preferences.PREFS_NAME, 0);
+				String sapuser = settings.getString(Preferences.KEY_SAP_USERNAME, null);
+				String sappwd = settings.getString(Preferences.KEY_SAP_PASSWORD, null);
+
+				//setup authentication
+				httpclient.getCredentialsProvider().setCredentials(
+						new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
+						new UsernamePasswordCredentials(sapuser, sappwd));
+
+				//we store redirect in order to get javascript domain problem sorted
+				httpclient.setRedirectHandler(redirectHandler);
+
+				HttpGet httpget = new HttpGet(strURL);
+
+				//Do the actual http call
+				HttpResponse response = httpclient.execute(httpget);
+				
+				int responseCode = response.getStatusLine().getStatusCode();
+				
+				HttpEntity entity = response.getEntity();
+				String contentType = entity.getContentType().getValue();
+				Log.d(this.getClass().getName(), "Response code " + responseCode + "Response has contentType "
+						+ contentType);
+
+				// handle different content types
+				if (contentType == null || !contentType.startsWith("text")) {
+					Toast.makeText(
+							SAPNoteView.this,
+							"Downloads are not supported in current version. Content-type:"
+									+ contentType, Toast.LENGTH_LONG).show();
+					return null;
+				}
+
+				BasicResponseHandler responseHandler= new BasicResponseHandler();
+				String htmlOrg = responseHandler.handleResponse(response);
 	
-	private void hideKeyboard(){
+				if (entity != null) {
+					entity.consumeContent();
+				}
+				return htmlOrg;
+				
+			} catch (Exception e) {
+				Toast.makeText(SAPNoteView.this,
+						"Httpclient failed, attempting backup solution",
+						Toast.LENGTH_LONG).show();
+				
+				Log.e(this.getClass().getName(), "Error during httpclient", e);
+				return null;
+			} finally {
+				// When HttpClient instance is no longer needed,
+				// shut down the connection manager to ensure
+				// immediate deallocation of all system resources
+				if (httpclient != null) {
+					httpclient.getConnectionManager().shutdown();
+				}
+			}
+
+		}
+		
+		
+		protected void onPostExecute(String htmlOrg) {
+			if(htmlOrg==null || htmlOrg.equals("")){
+				Toast.makeText(SAPNoteView.this,
+						"Problems with download. Attempting backup solution",
+						Toast.LENGTH_LONG).show();
+				webview.loadUrl(downloadUrl);
+				return;
+			}
+			publishProgress("Note loaded, now adjusting HTML to fix problems");
+			// if we followed a link, we need to sniff the note number from
+			// the html
+			if (bAttemptToSniffNoteFromHTTP) {
+				String sapNoteNr = getNoteNrFromString(htmlOrg);
+				if (sapNoteNr != null) {
+					txtNote.setText(sapNoteNr);
+				} else {
+					Toast
+							.makeText(
+									SAPNoteView.this,
+									"Could not find SAP Note number from content. Save to favorites will not be possible",
+									Toast.LENGTH_LONG).show();
+				}
+
+			}
+
+			// try to read the name of the note
+			strNoteTitle = getNoteTitleFromString(htmlOrg);
+			if (strNoteTitle == null) {
+				strNoteTitle = "Note "
+						+ ((Editable) txtNote.getText()).toString();
+			}
+			strNoteTitle.replaceAll("&amp;", "&");
+
+			// background-color tricks seems to work in chrome, but not on
+			// android
+			htmlOrg = htmlOrg
+					.replaceAll(
+							"\\<div id=\"oc_1\".*?\\>",
+							"<div id=\"oc_1\" ct=\"SC\" class=\"urScrl\" style=\"background-color:#FFFFFF;\" >");
+			
+			String baseURL = "https://"+ redirectHandler.getLastServerHost();
+			
+			Log.d(this.getClass().getName(), "HTML adjusted. Base url is "+baseURL);
+			webview.loadDataWithBaseURL(baseURL, htmlOrg, "text/html",
+					"utf-8", null);
+
+		}
+	}
+
+	private void hideKeyboard() {
 		// close soft keyboard
 		InputMethodManager inputManager = (InputMethodManager) SAPNoteView.this
 				.getSystemService(Context.INPUT_METHOD_SERVICE);
 		inputManager.hideSoftInputFromWindow(txtNote.getWindowToken(), 0);
-		
-		/*inputManager.hideSoftInputFromWindow(txtNote.getWindowToken(),
-				InputMethodManager.HIDE);
-		*/
+
+		/*
+		 * inputManager.hideSoftInputFromWindow(txtNote.getWindowToken(),
+		 * InputMethodManager.HIDE);
+		 */
 	}
-
-
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -323,89 +390,62 @@ public class SAPNoteView extends Activity {
 			return true;
 		case R.id.menuShare:
 			String strNote2 = ((Editable) txtNote.getText()).toString();
-			String shareTxt= "http://service.sap.com/sap/support/notes/" + strNote2 + " "+ strNoteTitle;
+			String shareTxt = "http://service.sap.com/sap/support/notes/"
+					+ strNote2 + " " + strNoteTitle;
 			Intent shareIntent = new Intent();
 			shareIntent.setAction(Intent.ACTION_SEND);
 			shareIntent.setType("text/plain");
 			shareIntent.putExtra(Intent.EXTRA_TEXT, shareTxt);
-			
-			/* Send it off to the Activity-Chooser */  
-			startActivity(Intent.createChooser(shareIntent, "Share note.."));  
+
+			/* Send it off to the Activity-Chooser */
+			startActivity(Intent.createChooser(shareIntent, "Share note.."));
 			return true;
 		default:
 			return super.onMenuItemSelected(featureId, item);
 		}
 
 	}
-	
-	private String getNoteNrFromString(String html){
-		//find the text in the title element
-		Pattern p= Pattern.compile("(?s)<title>(.*)</title>");
-		Matcher m= p.matcher(html);
-		if (m.find()){
+
+	private String getNoteNrFromString(String html) {
+		// find the text in the title element
+		Pattern p = Pattern.compile("(?s)<title>(.*)</title>");
+		Matcher m = p.matcher(html);
+		if (m.find()) {
 			String title = m.group(1).trim();
-			StringTokenizer tokenizer = new StringTokenizer (title," ");
-			if(tokenizer.countTokens()>=2){
+			StringTokenizer tokenizer = new StringTokenizer(title, " ");
+			if (tokenizer.countTokens() >= 2) {
 				tokenizer.nextToken();
-				String noteNr= tokenizer.nextToken();
-				//System.out.println(noteNr);
+				String noteNr = tokenizer.nextToken();
+				// System.out.println(noteNr);
 				return noteNr;
 			}
 		}
 		return null;
 	}
-	
-	
-	private String getNoteTitleFromString(String html){
-		//find the text in the title element
-		Pattern p= Pattern.compile("<span id=header_data .+?>(.+?)</span>");
-		Matcher m= p.matcher(html);
-		if (m.find()){
+
+	private String getNoteTitleFromString(String html) {
+		// find the text in the title element
+		Pattern p = Pattern.compile("<span id=header_data .+?>(.+?)</span>");
+		Matcher m = p.matcher(html);
+		if (m.find()) {
 			String title = m.group(1).trim();
-			if(title.equals("")){
+			if (title.equals("")) {
 				return null;
-			}else {
+			} else {
 				return title;
 			}
-			
+
 		}
 		return null;
-	}	
-	
-	private static String convertStreamToString(InputStream is) {
-        /*
-         * To convert the InputStream to String we use the BufferedReader.readLine()
-         * method. We iterate until the BufferedReader return null which means
-         * there's no more data to read. Each line will appended to a StringBuilder
-         * and returned as String.
-         */
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
- 
-        String line = null;
-        try {
-            while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return sb.toString();
-    }
-	
+	}
+
 
 	/**
-	 * Override method in order to avoid 
-	 * webview reload on changed orientation.
+	 * Override method in order to avoid webview reload on changed orientation.
 	 * 
-	 * Also requires modification in AndroidManifest.xml
-	 * See http://stackoverflow.com/questions/1002085/android-webview-handling-orientation-changes
+	 * Also requires modification in AndroidManifest.xml See
+	 * http://stackoverflow
+	 * .com/questions/1002085/android-webview-handling-orientation-changes
 	 */
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
@@ -416,18 +456,14 @@ public class SAPNoteView extends Activity {
 	private void addNoteToFavorites(String strNote) {
 		try {
 			long lngNote = Long.parseLong(strNote);
-			//strNoteTitle is set during load
-			long lngRet =mDbHelper.createNote(lngNote, strNoteTitle);
-			if (lngRet!=-1){
-				Toast
-				.makeText(
-						SAPNoteView.this,
-						"Added note "+ lngNote + " to favorites",
+			// strNoteTitle is set during load
+			long lngRet = mDbHelper.createNote(lngNote, strNoteTitle);
+			if (lngRet != -1) {
+				Toast.makeText(SAPNoteView.this,
+						"Added note " + lngNote + " to favorites",
 						Toast.LENGTH_SHORT).show();
-			}else {
-				Toast
-				.makeText(
-						SAPNoteView.this,
+			} else {
+				Toast.makeText(SAPNoteView.this,
 						"Failed to add " + lngNote + " to favorites",
 						Toast.LENGTH_SHORT).show();
 			}
@@ -439,11 +475,12 @@ public class SAPNoteView extends Activity {
 							"Text field must contain a note number before it is added to favorites",
 							Toast.LENGTH_LONG).show();
 		}
-		
+
 	}
 
 	private class SAPNoteViewClient extends WebViewClient {
-		private boolean bHaveTriedManual=false;
+		private boolean bHaveTriedManual = false;
+
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
 			Log.i(this.getClass().getName(), "Loading URL:" + url);
@@ -451,36 +488,36 @@ public class SAPNoteView extends Activity {
 			if (url != null && url.contains("display_pdf")) {
 				return false;
 			} else {
-				//trying to make sure links to notes are loaded through our code
-				//this so that we can fix the scroll problems and get the note title
-				if(bHaveTriedManual==false){
-					bHaveTriedManual=true;
-					bAttemptToSniffNoteFromHTTP=true;
-					viewNoteInternal(url);
+				// trying to make sure links to notes are loaded through our
+				// code
+				// this so that we can fix the scroll problems and get the note
+				// title
+				if (bHaveTriedManual == false) {
+					Log.i(this.getClass().getName(), "Will try to sniff note number from the HTML content");
+					bHaveTriedManual = true;
+					bAttemptToSniffNoteFromHTTP = true;
+					viewNoteFromURL(url);
 					return true;
 				}
-				
+
 				view.loadUrl(url);
 				return true;
 			}
 
 		}
-		
-		public void onLoadResource(WebView view, String url){
-			String s=null;
-			
+
+		public void onLoadResource(WebView view, String url) {
+			Log.d(this.getClass().getName(), "onLoadResource:" + url);
 		}
-		
-		
 
 		@Override
 		public void onPageFinished(WebView view, String url) {
-			int contentHeight= webview.getContentHeight();
+			Log.d(this.getClass().getName(), "onPageFinished:" + url);
+			int contentHeight = webview.getContentHeight();
 			super.onPageFinished(view, url);
-			bHaveTriedManual=false;
+			bHaveTriedManual = false;
+			//TODO: Stop loading icon
 		}
-
-
 
 		/**
 		 * Handle authentication request by trying the already stored sap
@@ -490,9 +527,10 @@ public class SAPNoteView extends Activity {
 		public void onReceivedHttpAuthRequest(WebView view,
 				HttpAuthHandler handler, String host, String realm) {
 
-			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-			String sapuser = settings.getString("sapuser", null);
-			String sappwd = settings.getString("sappwd", null);
+			Log.d(this.getClass().getName(), "onReceivedHttpAuthRequest:" + host);
+			SharedPreferences settings = getSharedPreferences(Preferences.PREFS_NAME, 0);
+			String sapuser = settings.getString(Preferences.KEY_SAP_USERNAME, null);
+			String sappwd = settings.getString(Preferences.KEY_SAP_PASSWORD, null);
 
 			assert (sapuser != null);
 
@@ -507,43 +545,42 @@ public class SAPNoteView extends Activity {
 		@Override
 		public void onReceivedError(WebView view, int errorCode,
 				String description, String failingUrl) {
-			bHaveTriedManual=false;
+			Log.w(this.getClass().getName(), "onReceivedError:" +errorCode + " "+ failingUrl + "\n"+description);
+			bHaveTriedManual = false;
 			Toast.makeText(SAPNoteView.this,
 					"An error has occured: " + description, Toast.LENGTH_LONG)
 					.show();
 		}
 
 	}
-	
+
 	private class CustomRedirectHandler extends DefaultRedirectHandler {
-		//default is service.sap.com
-		String lastServerHost="service.sap.com";
-		
+		// default is service.sap.com
+		String lastServerHost = "service.sap.com";
+
 		@Override
 		public URI getLocationURI(HttpResponse response, HttpContext context)
 				throws ProtocolException {
-		
-			//get the location header to find out where to redirect to
-	        Header locationHeader = response.getFirstHeader("location");
-	        String locationValue= locationHeader.getValue();
-	        URL url;
+
+			// get the location header to find out where to redirect to
+			Header locationHeader = response.getFirstHeader("location");
+			String locationValue = locationHeader.getValue();
+			URL url;
 			try {
 				url = new URL(locationValue);
-				lastServerHost=url.getHost();
+				lastServerHost = url.getHost();
 			} catch (MalformedURLException e) {
-				//Ignore
-				//e.printStackTrace();
+				// Ignore
+				// e.printStackTrace();
 			}
-	        
-	      			
+
 			return super.getLocationURI(response, context);
 		}
-		
-		public String getLastServerHost(){
+
+		public String getLastServerHost() {
 			return lastServerHost;
 		}
-		
-		
+
 	}
 
 	/**
