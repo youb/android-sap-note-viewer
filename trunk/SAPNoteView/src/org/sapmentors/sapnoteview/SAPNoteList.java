@@ -71,12 +71,10 @@ public class SAPNoteList extends ListActivity {
 			}
 		});
 		
-		ImageButton bSearch = (ImageButton) thisActivity.findViewById(R.id.title_search_button);
-		bSearch.setOnClickListener(new OnClickListener() {
+		ImageButton bTopSearch = (ImageButton) findViewById(R.id.title_search_button);
+		bTopSearch.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				Intent i = new Intent(thisActivity, SAPNoteView.class);
-				i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				thisActivity.startActivity(i);
+				onSearchRequested();
 			}
 		});
 	}	

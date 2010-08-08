@@ -22,7 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class SAPNoteSetup extends Activity {
-	public static final String PREFS_NAME = "SAPNotePrefs";
 	private EditText txtUsername;
 	private EditText txtPassword;
 	private GoogleAnalyticsTracker tracker;
@@ -44,12 +43,12 @@ public class SAPNoteSetup extends Activity {
 		txtPassword = (EditText) findViewById(R.id.txtPassword);
 
 
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		String sapuser = settings.getString("sapuser", null);
+		SharedPreferences settings = getSharedPreferences(Preferences.PREFS_NAME, 0);
+		String sapuser = settings.getString(Preferences.KEY_SAP_USERNAME, null);
 		if(sapuser!=null){
 			txtUsername.setText(sapuser);
 		}
-		String sappwd = settings.getString("sappwd", null);
+		String sappwd = settings.getString(Preferences.KEY_SAP_PASSWORD, null);
 		if(sappwd!=null){
 			txtPassword.setText(sappwd);
 		}
@@ -69,13 +68,10 @@ public class SAPNoteSetup extends Activity {
 			}
 		});
 		
-		ImageButton bSearch = (ImageButton) thisActivity.findViewById(R.id.title_search_button);
-		bSearch.setOnClickListener(new OnClickListener() {
+		ImageButton bTopSearch = (ImageButton) findViewById(R.id.title_search_button);
+		bTopSearch.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				saveSettings();
-				Intent i = new Intent(thisActivity, SAPNoteView.class);
-				i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				thisActivity.startActivity(i);
+				onSearchRequested();
 			}
 		});
 	}
@@ -109,20 +105,20 @@ public class SAPNoteSetup extends Activity {
 		String strUsername = ((Editable) txtUsername.getText()).toString();
 		String strPassword = ((Editable) txtPassword.getText()).toString();
 		
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences settings = getSharedPreferences(Preferences.PREFS_NAME, 0);
 		SharedPreferences.Editor editor = settings.edit();
-		editor.putString("sapuser", strUsername);
-		editor.putString("sappwd", strPassword);
+		editor.putString(Preferences.KEY_SAP_USERNAME, strUsername);
+		editor.putString(Preferences.KEY_SAP_PASSWORD, strPassword);
 		editor.commit();
 		Toast.makeText(SAPNoteSetup.this, "Saved settings",
 				Toast.LENGTH_SHORT).show();	
 	}
 	
 	private void clearSettings(){
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences settings = getSharedPreferences(Preferences.KEY_SAP_USERNAME, 0);
 		SharedPreferences.Editor editor = settings.edit();
-		editor.remove("sapuser");
-		editor.remove("sappwd");
+		editor.remove(Preferences.KEY_SAP_USERNAME);
+		editor.remove(Preferences.KEY_SAP_PASSWORD);
 		editor.commit();
 		
 		txtUsername.setText("");
