@@ -58,16 +58,15 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1">
-            <Button android:id="@+id/home_btn_map"
+            <Button android:id="@+id/home_btn_search"
                 style="@style/HomeButton"
-                android:text="@string/btn_map"
+                android:text="@string/btn_search"
                 android:drawableTop="@drawable/home_btn_map"/>
                 
-            <Button android:id="@+id/home_btn_vendors"
+            <Button android:id="@+id/home_btn_setup"
                 style="@style/HomeButton"
-                android:text="@string/btn_vendors"
+                android:text="@string/btn_setup"
                 android:drawableTop="@drawable/home_btn_sandbox"/>
-
         </LinearLayout>
 
         <LinearLayout
@@ -79,7 +78,7 @@
 
         </LinearLayout>
     </LinearLayout>
-
+<!-- FOOTER -->
     <LinearLayout
         android:id="@+id/footer"
         android:layout_width="fill_parent"
