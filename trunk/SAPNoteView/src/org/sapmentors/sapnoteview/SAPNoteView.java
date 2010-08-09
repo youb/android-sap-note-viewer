@@ -37,6 +37,7 @@ import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
@@ -61,9 +62,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class SAPNoteView extends Activity {
-	public static final String PREFS_NAME = "SAPNotePrefs";
-
-	public static final String KEY_ID = "SAPNoteNr";
+	public static final String INTENT_EXTRA_KEY_ID = "SAPNoteNr";
 
 	private WebView webview;
 	private Button bView;
@@ -83,7 +82,7 @@ public class SAPNoteView extends Activity {
 		bAttemptToSniffNoteFromHTTP = false;
 
 		// if no user is setup, redirect to setup
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences settings = getSharedPreferences(Preferences.PREFS_NAME, 0);
 		String sapuser = settings.getString(Preferences.KEY_SAP_USERNAME, null);
 		if (sapuser == null) {
 			Toast
@@ -138,8 +137,8 @@ public class SAPNoteView extends Activity {
 		Bundle extras = intent.getExtras();
 
 		// check if we got an intent parameter from our application
-		if (extras != null && extras.containsKey(KEY_ID)) {
-			long sapNoteNr = extras.getLong(KEY_ID);
+		if (extras != null && extras.containsKey(INTENT_EXTRA_KEY_ID)) {
+			long sapNoteNr = extras.getLong(INTENT_EXTRA_KEY_ID);
 			txtNote.setText(sapNoteNr + "");
 			viewNote(sapNoteNr + "");
 			// hack to check if the dataString is pure numeric
@@ -387,6 +386,7 @@ public class SAPNoteView extends Activity {
 		case R.id.menuAdd:
 			String strNote = ((Editable) txtNote.getText()).toString();
 			addNoteToFavorites(strNote);
+			
 			return true;
 		case R.id.menuShare:
 			String strNote2 = ((Editable) txtNote.getText()).toString();
@@ -399,6 +399,7 @@ public class SAPNoteView extends Activity {
 
 			/* Send it off to the Activity-Chooser */
 			startActivity(Intent.createChooser(shareIntent, "Share note.."));
+			tracker.trackEvent("Note", "Shared", strNote2,0 );
 			return true;
 		default:
 			return super.onMenuItemSelected(featureId, item);
@@ -462,6 +463,7 @@ public class SAPNoteView extends Activity {
 				Toast.makeText(SAPNoteView.this,
 						"Added note " + lngNote + " to favorites",
 						Toast.LENGTH_SHORT).show();
+				tracker.trackEvent("Note", "Favorite", strNote,0 );
 			} else {
 				Toast.makeText(SAPNoteView.this,
 						"Failed to add " + lngNote + " to favorites",

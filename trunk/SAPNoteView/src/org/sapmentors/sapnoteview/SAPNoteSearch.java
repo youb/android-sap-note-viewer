@@ -59,6 +59,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class SAPNoteSearch extends Activity {
+	private final String SEARCH_PRIMARY_URL="https://service.sap.com/xsearch";
+	private final String SEARCH_SECONDARY_URL="https://service.sap.com/notes";
+	
+
+
 	public static final String PREFS_NAME = "SAPNotePrefs";
 
 	private WebView webview;
@@ -106,7 +111,7 @@ public class SAPNoteSearch extends Activity {
 				SAPNoteSearch.this.setProgress(progress * 100);
 			}
 		});
-		viewSearch();
+		viewSearch(SEARCH_PRIMARY_URL);
 	}
 	
 	
@@ -132,106 +137,16 @@ public class SAPNoteSearch extends Activity {
 			}
 		});
 	}	
-	private void viewSearch(){
-		viewNoteInternal("https://websmp204.sap-ag.de/xsearch");
+	private void viewSearch(String searchURL){
+		
+		webview.loadUrl(searchURL);
+		Toast.makeText(SAPNoteSearch.this,
+				"Loading search interface from " + searchURL + "\nIt may be a bit slow to load", Toast.LENGTH_LONG)
+				.show();
 	}
 
-	private void viewNoteInternal(String strURL) {
-		// give a short message to user
-		Toast.makeText(SAPNoteSearch.this, "Loading " + strURL,Toast.LENGTH_LONG).show();
-		DefaultHttpClient httpclient=null;
-		try {
-	        httpclient = new DefaultHttpClient();
-	
-	        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-			String sapuser = settings.getString("sapuser", null);
-			String sappwd = settings.getString("sappwd", null);
-	        
-	        httpclient.getCredentialsProvider().setCredentials(
-	                new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), 
-	                new UsernamePasswordCredentials(sapuser, sappwd));
-	 
-	        CustomRedirectHandler redirectHandler =  new CustomRedirectHandler();
-	        httpclient.setRedirectHandler(redirectHandler);
-	        
-	        HttpGet httpget = new HttpGet(strURL);
-	        
-	        
-	        HttpResponse response = httpclient.execute(httpget);
-	        HttpEntity entity = response.getEntity();
-	        String contentType= entity.getContentType().getValue();
-	        Log.d(this.getClass().getName(), "Response has contentType "+contentType);
-	        
-	        //handle different content types
-	        if(contentType==null || !contentType.startsWith("text")){
-	        	Toast.makeText(SAPNoteSearch.this, "Downloads are not supported in current version. Content-type:" + contentType,Toast.LENGTH_LONG).show();
-	        	return;
-	        }
-	        
-	        InputStream is =entity.getContent();
-	        String htmlOrg = convertStreamToString(is);
-	        
-	        
-	        
-	        //background-color tricks seems to work in chrome, but not on android
-	        //htmlOrg = htmlOrg.replaceAll("\\<div id=\"oc_1\".*?\\>","<div id=\"oc_1\" ct=\"SC\" class=\"urScrl\" style=\"background-color:#FFFFFF;\" >");
-	        //replace for knowledge base articles
-	        //htmlOrg = htmlOrg.replaceAll("\\<div id=\"Display_Container\".*?\\>","<div id=\"Display_Container\" ct=\"SC\" class=\"urScrl\" style=\"background-color:#FFFFFF;\" >");
-	        
-	        
-	        
-	        String baseURL = "https://" + redirectHandler.getLastServerHost();
-	        webview.loadDataWithBaseURL(baseURL, htmlOrg, "text/html", "utf-8", null);
-	        //webview.loadDataWithBaseURL("https://service.sap.com", htmlOrg, "text/html", "utf-8", null);
-	        
-	        if (entity != null) {
-	            entity.consumeContent();
-	        }
-		}catch (Exception e){
-			Toast.makeText(SAPNoteSearch.this, "Httpclient failed, attempting backup solution",Toast.LENGTH_LONG).show();
-			webview.loadUrl(strURL);
-			Log.e(this.getClass().getName(),"Error during httpclient",e);
-		}finally{
-		       // When HttpClient instance is no longer needed, 
-	        // shut down the connection manager to ensure
-	        // immediate deallocation of all system resources
-	        if(httpclient!=null){
-	        	httpclient.getConnectionManager().shutdown();
-	        }
-		}
-
-	}
-	
 
 
-	
-	private static String convertStreamToString(InputStream is) {
-        /*
-         * To convert the InputStream to String we use the BufferedReader.readLine()
-         * method. We iterate until the BufferedReader return null which means
-         * there's no more data to read. Each line will appended to a StringBuilder
-         * and returned as String.
-         */
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
- 
-        String line = null;
-        try {
-            while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return sb.toString();
-    }
-	
 
 	/**
 	 * Override method in order to avoid 
@@ -246,41 +161,56 @@ public class SAPNoteSearch extends Activity {
 		super.onConfigurationChanged(newConfig);
 	}
 
+	/**
+	 * Class which picks up events indicating that the user 
+	 * has navigated to an SAP note
+	 * 
+	 * @author dapa
+	 *
+	 */
 	private class SAPNoteViewClient extends WebViewClient {
-		private boolean bHaveTriedManual=false;
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
-			Log.i(this.getClass().getName(), "Loading URL:" + url);
+			Log.i(this.getClass().getName(), "Search loading URL:" + url);
 			//
-			if (url != null && url.contains("display_pdf")) {
-				return false;
+			if (url != null && url.contains("/sap/support/notes/")) {
+				return sendToNoteView(url);	
 			} else {
-				//trying to make sure links to notes are loaded through our code
-				//this so that we can fix the scroll problems and get the note title
-				if(bHaveTriedManual==false){
-					bHaveTriedManual=true;
-					viewNoteInternal(url);
-					return true;
-				}
-				
-				view.loadUrl(url);
-				return true;
+				//allow current webview to handle
+				return false;
 			}
 
 		}
 		
 		public void onLoadResource(WebView view, String url){
-			String s=null;
+			Log.d(this.getClass().getName(), "onLoadResource:" + url);
+			if (url != null && url.contains("/sap/support/notes/")) {
+				//webview.goBack();
+				sendToNoteView(url);
+				
+			}
 			
 		}
 		
-		
-
-		@Override
-		public void onPageFinished(WebView view, String url) {
-			int contentHeight= webview.getContentHeight();
-			super.onPageFinished(view, url);
-			bHaveTriedManual=false;
+		private boolean sendToNoteView(String url){
+			//user has clicked an SAP note.. Pass to view note activity
+			try {
+				//we get the last token of the url
+				StringTokenizer tokenizer = new StringTokenizer(url,"/");
+				String lastToken = null;
+				while (tokenizer.hasMoreTokens()){
+					lastToken = tokenizer.nextToken();
+				}
+				String strSAPNote = lastToken;
+				long sapNoteNr = Long.parseLong(strSAPNote);
+				Intent i1 = new Intent(getApplicationContext(), SAPNoteView.class);
+				i1.putExtra(SAPNoteView.INTENT_EXTRA_KEY_ID, sapNoteNr);
+				startActivity(i1);
+				return true;
+			}catch (Exception e) {
+				Log.w(this.getClass().getName(), "Exception from search", e);
+				return false;
+			}	
 		}
 
 
@@ -293,9 +223,9 @@ public class SAPNoteSearch extends Activity {
 		public void onReceivedHttpAuthRequest(WebView view,
 				HttpAuthHandler handler, String host, String realm) {
 
-			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-			String sapuser = settings.getString("sapuser", null);
-			String sappwd = settings.getString("sappwd", null);
+			SharedPreferences settings = getSharedPreferences(Preferences.PREFS_NAME, 0);
+			String sapuser = settings.getString(Preferences.KEY_SAP_USERNAME, null);
+			String sappwd = settings.getString(Preferences.KEY_SAP_PASSWORD, null);
 
 			assert (sapuser != null);
 
@@ -310,7 +240,6 @@ public class SAPNoteSearch extends Activity {
 		@Override
 		public void onReceivedError(WebView view, int errorCode,
 				String description, String failingUrl) {
-			bHaveTriedManual=false;
 			Toast.makeText(SAPNoteSearch.this,
 					"An error has occured: " + description, Toast.LENGTH_LONG)
 					.show();
@@ -318,36 +247,29 @@ public class SAPNoteSearch extends Activity {
 
 	}
 	
-	private class CustomRedirectHandler extends DefaultRedirectHandler {
-		//default is service.sap.com
-		String lastServerHost="service.sap.com";
-		
-		@Override
-		public URI getLocationURI(HttpResponse response, HttpContext context)
-				throws ProtocolException {
-		
-			//get the location header to find out where to redirect to
-	        Header locationHeader = response.getFirstHeader("location");
-	        String locationValue= locationHeader.getValue();
-	        URL url;
-			try {
-				url = new URL(locationValue);
-				lastServerHost=url.getHost();
-			} catch (MalformedURLException e) {
-				//Ignore
-				//e.printStackTrace();
-			}
-	        
-	      			
-			return super.getLocationURI(response, context);
-		}
-		
-		public String getLastServerHost(){
-			return lastServerHost;
-		}
-		
-		
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.menu_search, menu);
+		return true;
 	}
+
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		//always save settings
+		switch (item.getItemId()) {
+		case R.id.menuSearchPrimary:
+			viewSearch(SEARCH_PRIMARY_URL);
+			return true;
+		case R.id.menuSearchSecondary:
+			viewSearch(SEARCH_SECONDARY_URL);
+			return true;
+		default:
+			return super.onMenuItemSelected(featureId, item);
+		}
+
+	}	
+	
 	/**
 	 * Handle the back key specifically
 	 */
@@ -358,5 +280,7 @@ public class SAPNoteSearch extends Activity {
 		}
 		return super.onKeyDown(keyCode, event);
 	}
+	
+	
 
 }

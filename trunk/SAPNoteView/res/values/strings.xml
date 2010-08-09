@@ -4,7 +4,7 @@
 	<string name="app_name_setup">Setup</string>
 	<string name="app_name_list">Favorite</string>
 	<string name="app_name_home">Home</string>	
-	<string name="app_name_search">Search</string>	
+	<string name="app_name_search">Search (beta)</string>	
 	<string name="app_name">SAP Note Viewer</string>
 
 	<string name="title_text">Support note viewer</string>
@@ -29,15 +29,18 @@
 	<string name="menuClear">Clear settings</string>
 	<string name="menuSave">Save</string>
 	
+	<string name="menuSearchPrimary">Go to primary search</string>
+	<string name="menuSearchSecondary">Go to secondary search</string>
+	
 	<string name="contextMenuView">View</string>
 	<string name="contextMenuShare">Share</string>
 	<string name="contextMenuDelete">Delete</string>
 
 	<string name="listNoNotes">No Notes have been stored. Select View Notes from menu to continue</string>
 	
-    <string name="btn_map">Search</string>
+    <string name="btn_search">Search (beta)</string>
     <string name="btn_starred">Favorites</string>
-    <string name="btn_vendors">Sharing</string>
+    <string name="btn_setup">Setup</string>
     <string name="btn_notes">View note</string>
     
 	<string name="title_search">Search</string>

@@ -117,7 +117,7 @@ public class SAPNoteList extends ListActivity {
 		switch (item.getItemId()) {
 		case ACTION_VIEW:
 			Intent i1 = new Intent(this, SAPNoteView.class);
-			i1.putExtra(SAPNoteView.KEY_ID, info.id);
+			i1.putExtra(SAPNoteView.INTENT_EXTRA_KEY_ID, info.id);
 			startActivity(i1);
 			return true;
 		case  ACTION_SHARE:
@@ -160,7 +160,7 @@ public class SAPNoteList extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		Intent i = new Intent(this, SAPNoteView.class);
-		i.putExtra(SAPNoteView.KEY_ID, id);
+		i.putExtra(SAPNoteView.INTENT_EXTRA_KEY_ID, id);
 		startActivity(i);
 	}
 
