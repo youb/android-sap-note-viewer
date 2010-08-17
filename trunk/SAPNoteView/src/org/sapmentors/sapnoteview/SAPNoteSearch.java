@@ -55,6 +55,7 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -83,7 +84,7 @@ public class SAPNoteSearch extends Activity {
 							SAPNoteSearch.this,
 							"Please provide your SAP service marketplace user before continuing",
 							Toast.LENGTH_LONG).show();
-			Intent i = new Intent(this, SAPNoteSetup.class);
+			Intent i = new Intent(this, SAPNotePreferences.class);
 			startActivity(i);
 		}
 
@@ -108,7 +109,11 @@ public class SAPNoteSearch extends Activity {
 		// progress bar in title
 		webview.setWebChromeClient(new WebChromeClient() {
 			public void onProgressChanged(WebView view, int progress) {
-				SAPNoteSearch.this.setProgress(progress * 100);
+                if(progress==100){
+                	updateLoading(false);
+                }else {
+                	updateLoading(true);
+                }
 			}
 		});
 		viewSearch(SEARCH_PRIMARY_URL);
@@ -145,7 +150,16 @@ public class SAPNoteSearch extends Activity {
 				.show();
 	}
 
-
+	
+	private void updateLoading(boolean isLoading){
+		ProgressBar loadingIndicator = (ProgressBar) findViewById(R.id.title_loading);
+		if(isLoading){
+			loadingIndicator.setVisibility(View.VISIBLE);
+		}else {
+			loadingIndicator.setVisibility(View.GONE);
+		}
+		
+	}
 
 
 	/**
@@ -171,7 +185,8 @@ public class SAPNoteSearch extends Activity {
 	private class SAPNoteViewClient extends WebViewClient {
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
-			Log.i(this.getClass().getName(), "Search loading URL:" + url);
+			Log.d(this.getClass().getName(), "Search loading URL:" + url);
+            updateLoading(true);
 			//
 			if (url != null && url.contains("/sap/support/notes/")) {
 				return sendToNoteView(url);	
@@ -184,8 +199,10 @@ public class SAPNoteSearch extends Activity {
 		
 		public void onLoadResource(WebView view, String url){
 			Log.d(this.getClass().getName(), "onLoadResource:" + url);
+			updateLoading(true);
 			if (url != null && url.contains("/sap/support/notes/")) {
 				//webview.goBack();
+				updateLoading(false);
 				sendToNoteView(url);
 				
 			}
@@ -223,9 +240,9 @@ public class SAPNoteSearch extends Activity {
 		public void onReceivedHttpAuthRequest(WebView view,
 				HttpAuthHandler handler, String host, String realm) {
 
-			SharedPreferences settings = getSharedPreferences(Preferences.PREFS_NAME, 0);
-			String sapuser = settings.getString(Preferences.KEY_SAP_USERNAME, null);
-			String sappwd = settings.getString(Preferences.KEY_SAP_PASSWORD, null);
+			SharedPreferences settings = getSharedPreferences(SAPNotePreferences.PREFS_NAME, 0);
+			String sapuser = settings.getString(SAPNotePreferences.KEY_SAP_USERNAME, null);
+			String sappwd = settings.getString(SAPNotePreferences.KEY_SAP_PASSWORD, null);
 
 			assert (sapuser != null);
 

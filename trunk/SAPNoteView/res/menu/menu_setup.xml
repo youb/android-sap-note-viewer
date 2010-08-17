@@ -4,7 +4,7 @@
     <item android:id="@+id/menuSave"
           android:title="@string/menuSave" 
           android:icon="@android:drawable/ic_menu_save" /> 
-    <item android:id="@+id/menuClear"
-          android:title="@string/menuClear" 
+    <item android:id="@+id/menuCancel"
+          android:title="@string/menuCancel" 
           android:icon="@android:drawable/ic_menu_close_clear_cancel" />          
 </menu>

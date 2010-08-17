@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<!-- UI framework header names   -->
 	<string name="app_name_view">View note</string>
 	<string name="app_name_setup">Setup</string>
 	<string name="app_name_list">Favorite</string>
@@ -7,42 +8,69 @@
 	<string name="app_name_search">Search (beta)</string>	
 	<string name="app_name">SAP Note Viewer</string>
 
+	<!-- UI framework home strings -->
 	<string name="title_text">Support note viewer</string>
 	<string name="footer_text">Unofficial app brought to you by the</string>
 
-	<string name="bView">View</string>
-	<string name="lblNote">SAP Note:</string>
-	<string name="lblUsername">SAP username:</string>
-	<string name="lblPassword">Password:</string>
+	<!-- UI framework main navigation elements -->
+    <string name="btn_search">Search (beta)</string>
+    <string name="btn_starred">Favorites</string>
+    <string name="btn_setup">Setup</string>
+    <string name="btn_notes">View note</string>
 
-	<string name="lblUsernameEnter">Please enter you SAP service marketplace user (used
-		for authentication)</string>
-	<string name="lblSetupWarning">If the note fails to load, it is most likely the
-		username which is wrong (android API doesn\'t report this properly)
-	</string>
 
+	<!--  Setup/Preferences strings -->
+	<string name="lblCategoryUser">SAP User login</string>
+	
+	<string name="lblUsernameTitle">Username</string>
+	<string name="lblUsernameSummaryBlank">Please enter a valid SAP Service Marketplace user</string>
+	<string name="lblUsernameDialogTitle">Username</string>
+	
+	<string name="lblPasswordTitle">Password</string>
+	<string name="lblPasswordSummaryBlank">Please enter password</string>
+	<string name="lblPasswordSummary">Password is set</string>
+	<string name="lblPasswordDialogTitle">Password</string>
+
+	<string name="lblCategoryOther">Other</string>
+
+	<string name="lblDownloadFolderTitle">Download folder</string>
+	<string name="lblDownloadFolderSummaryBlank">Please set a PDF download folder</string>
+	<string name="lblDownloadFolderDialogTitle">Download folder</string>
+	
+	<string name="lblAnalyticsTitle">Analytics</string>
+	<string name="lblAnalyticsSummary">Allow anonymous analytics in order to improve app</string>
+		
+	
+	<!-- old -->
+
+
+
+	<!--  Menu button strings -->
 	<string name="menuAdd">Add to favorite</string>
 	<string name="menuSetup">Setup</string>
 	<string name="menuView">View Notes</string>
 	<string name="menuShare">Share note</string>
 	<string name="menuFavorites">Favorites</string>
 	<string name="menuClear">Clear settings</string>
+	<string name="menuCancel">Cancel</string>
 	<string name="menuSave">Save</string>
-	
 	<string name="menuSearchPrimary">Go to primary search</string>
 	<string name="menuSearchSecondary">Go to secondary search</string>
 	
+	<!-- Long press strings -->
 	<string name="contextMenuView">View</string>
 	<string name="contextMenuShare">Share</string>
 	<string name="contextMenuDelete">Delete</string>
 
+	<!-- Note list activity strings -->
 	<string name="listNoNotes">No Notes have been stored. Select View Notes from menu to continue</string>
-	
-    <string name="btn_search">Search (beta)</string>
-    <string name="btn_starred">Favorites</string>
-    <string name="btn_setup">Setup</string>
-    <string name="btn_notes">View note</string>
-    
+
+	<!-- View activity strings -->
+	<string name="bView">View</string>
+	<string name="lblNote">SAP Note:</string>
+	<string name="HTTPAuthenticationFailed">Authentication failed. Please check your settings</string>
+
+    <!-- Quick search activity strings -->
 	<string name="title_search">Search</string>
     <string name="search_label">SAP Note Favorites</string>
     <string name="search_hint">Search favorites</string>    
