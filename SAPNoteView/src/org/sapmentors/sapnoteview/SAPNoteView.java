@@ -39,6 +39,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.AndroidCharacter;
 import android.text.Editable;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -58,6 +59,7 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -82,15 +84,15 @@ public class SAPNoteView extends Activity {
 		bAttemptToSniffNoteFromHTTP = false;
 
 		// if no user is setup, redirect to setup
-		SharedPreferences settings = getSharedPreferences(Preferences.PREFS_NAME, 0);
-		String sapuser = settings.getString(Preferences.KEY_SAP_USERNAME, null);
+		SharedPreferences settings = getSharedPreferences(SAPNotePreferences.PREFS_NAME, 0);
+		String sapuser = settings.getString(SAPNotePreferences.KEY_SAP_USERNAME, null);
 		if (sapuser == null) {
 			Toast
 					.makeText(
 							SAPNoteView.this,
 							"Please provide your SAP service marketplace user before continuing",
 							Toast.LENGTH_LONG).show();
-			Intent i = new Intent(this, SAPNoteSetup.class);
+			Intent i = new Intent(this, SAPNotePreferences.class);
 			startActivity(i);
 		}
 
@@ -117,6 +119,17 @@ public class SAPNoteView extends Activity {
 		webview.getSettings().setSupportZoom(true);
 
 		webview.setDownloadListener(new DownloadHandler());
+		
+        webview.setWebChromeClient(new WebChromeClient() {
+            public void onProgressChanged(WebView view, int progress) {
+                    if(progress==100){
+                    	updateLoading(false);
+                    }else {
+                    	updateLoading(true);
+                    }
+            }
+        });
+		
 
 		// View note button
 		bView = (Button) findViewById(R.id.bView);
@@ -128,6 +141,7 @@ public class SAPNoteView extends Activity {
 				viewNote(strNote);
 			}
 		});
+		
 
 		//Check if this intent was called with parameters
 		Intent intent = getIntent();
@@ -210,6 +224,7 @@ public class SAPNoteView extends Activity {
 	 */
 	private void viewNoteFromURL(String strURL) {
 		hideKeyboard();
+		updateLoading(true);
 		Toast
 				.makeText(SAPNoteView.this, "Loading " + strURL,
 						Toast.LENGTH_LONG).show();
@@ -217,6 +232,16 @@ public class SAPNoteView extends Activity {
 		//This task will also update the UI once finished
 		new DownloadNoteTask().execute(strURL);
 
+	}
+	
+	private void updateLoading(boolean isLoading){
+		ProgressBar loadingIndicator = (ProgressBar) findViewById(R.id.title_loading);
+		if(isLoading){
+			loadingIndicator.setVisibility(View.VISIBLE);
+		}else {
+			loadingIndicator.setVisibility(View.GONE);
+		}
+		
 	}
 //
 	private class DownloadNoteTask extends AsyncTask<String, String, String> {
@@ -252,9 +277,9 @@ public class SAPNoteView extends Activity {
 			try {
 				httpclient = new DefaultHttpClient();
 
-				SharedPreferences settings = getSharedPreferences(Preferences.PREFS_NAME, 0);
-				String sapuser = settings.getString(Preferences.KEY_SAP_USERNAME, null);
-				String sappwd = settings.getString(Preferences.KEY_SAP_PASSWORD, null);
+				SharedPreferences settings = getSharedPreferences(SAPNotePreferences.PREFS_NAME, 0);
+				String sapuser = settings.getString(SAPNotePreferences.KEY_SAP_USERNAME, null);
+				String sappwd = settings.getString(SAPNotePreferences.KEY_SAP_PASSWORD, null);
 
 				//setup authentication
 				httpclient.getCredentialsProvider().setCredentials(
@@ -275,13 +300,19 @@ public class SAPNoteView extends Activity {
 				String contentType = entity.getContentType().getValue();
 				Log.d(this.getClass().getName(), "Response code " + responseCode + "Response has contentType "
 						+ contentType);
+				
+				if(responseCode==401){
+					//we don't report this as the backup solution will provide the message
+					//publishProgress(getString(R.string.HTTPAuthenticationFailed));
+					
+					return null;
+				}
+
 
 				// handle different content types
 				if (contentType == null || !contentType.startsWith("text")) {
-					Toast.makeText(
-							SAPNoteView.this,
-							"Downloads are not supported in current version. Content-type:"
-									+ contentType, Toast.LENGTH_LONG).show();
+					publishProgress("Downloads are not supported in current version. Content-type:"
+									+ contentType);
 					return null;
 				}
 
@@ -294,10 +325,6 @@ public class SAPNoteView extends Activity {
 				return htmlOrg;
 				
 			} catch (Exception e) {
-				Toast.makeText(SAPNoteView.this,
-						"Httpclient failed, attempting backup solution",
-						Toast.LENGTH_LONG).show();
-				
 				Log.e(this.getClass().getName(), "Error during httpclient", e);
 				return null;
 			} finally {
@@ -482,11 +509,12 @@ public class SAPNoteView extends Activity {
 
 	private class SAPNoteViewClient extends WebViewClient {
 		private boolean bHaveTriedManual = false;
+		private boolean bAttemptedAuth=false;
 
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
 			Log.i(this.getClass().getName(), "Loading URL:" + url);
-			//
+			updateLoading(true);
 			if (url != null && url.contains("display_pdf")) {
 				return false;
 			} else {
@@ -510,6 +538,8 @@ public class SAPNoteView extends Activity {
 
 		public void onLoadResource(WebView view, String url) {
 			Log.d(this.getClass().getName(), "onLoadResource:" + url);
+			bAttemptedAuth=false;
+			updateLoading(true);
 		}
 
 		@Override
@@ -518,7 +548,7 @@ public class SAPNoteView extends Activity {
 			int contentHeight = webview.getContentHeight();
 			super.onPageFinished(view, url);
 			bHaveTriedManual = false;
-			//TODO: Stop loading icon
+			updateLoading(false);
 		}
 
 		/**
@@ -529,15 +559,24 @@ public class SAPNoteView extends Activity {
 		public void onReceivedHttpAuthRequest(WebView view,
 				HttpAuthHandler handler, String host, String realm) {
 
-			Log.d(this.getClass().getName(), "onReceivedHttpAuthRequest:" + host);
-			SharedPreferences settings = getSharedPreferences(Preferences.PREFS_NAME, 0);
-			String sapuser = settings.getString(Preferences.KEY_SAP_USERNAME, null);
-			String sappwd = settings.getString(Preferences.KEY_SAP_PASSWORD, null);
-
-			assert (sapuser != null);
-
-			handler.proceed(sapuser, sappwd);
-			// super.onReceivedHttpAuthRequest(view, handler, host, realm);
+			Log.d(this.getClass().getName(), "onReceivedHttpAuthRequest:" + host + " bAttemptedAuth="+bAttemptedAuth);
+			if(!bAttemptedAuth){
+				SharedPreferences settings = getSharedPreferences(SAPNotePreferences.PREFS_NAME, 0);
+				String sapuser = settings.getString(SAPNotePreferences.KEY_SAP_USERNAME, null);
+				String sappwd = settings.getString(SAPNotePreferences.KEY_SAP_PASSWORD, null);
+	
+				bAttemptedAuth=true;
+				handler.proceed(sapuser, sappwd);
+			}else {
+				//we've attempted authentication but it has failed
+				Toast.makeText(SAPNoteView.this, getString(R.string.HTTPAuthenticationFailed),
+						Toast.LENGTH_LONG).show();
+				handler.cancel();
+				Intent i = new Intent(view.getContext(), SAPNotePreferences.class);
+				startActivity(i);
+				
+			}
+			
 		}
 
 		/**
@@ -552,6 +591,7 @@ public class SAPNoteView extends Activity {
 			Toast.makeText(SAPNoteView.this,
 					"An error has occured: " + description, Toast.LENGTH_LONG)
 					.show();
+			updateLoading(false);
 		}
 
 	}

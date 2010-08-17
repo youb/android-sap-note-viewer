@@ -70,7 +70,7 @@ public class SAPNoteHome extends Activity {
 		Button bSetup = (Button) findViewById(R.id.home_btn_setup);
 		bSetup.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				Intent i = new Intent(thisActivity, SAPNoteSetup.class);
+				Intent i = new Intent(thisActivity, SAPNotePreferences.class);
 				startActivity(i);
 			}
 		});	

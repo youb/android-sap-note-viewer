@@ -28,7 +28,11 @@
 
         <ImageView style="@style/TitleBarSeparator" />
         <TextView style="@style/TitleBarText" />
-
+        
+        <ProgressBar style="@style/TitleBarProgressIndicator"
+            android:id="@+id/title_loading"
+            android:visibility="gone" />
+            
         <ImageView style="@style/TitleBarSeparator" />
         <ImageButton 
         	android:id="@id/title_search_button" 
