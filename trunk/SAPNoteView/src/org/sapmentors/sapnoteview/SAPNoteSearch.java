@@ -183,10 +183,12 @@ public class SAPNoteSearch extends Activity {
 	 *
 	 */
 	private class SAPNoteViewClient extends WebViewClient {
+		int authAttempts=0;
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
 			Log.d(this.getClass().getName(), "Search loading URL:" + url);
             updateLoading(true);
+            authAttempts=0;
 			//
 			if (url != null && url.contains("/sap/support/notes/")) {
 				return sendToNoteView(url);	
@@ -198,6 +200,7 @@ public class SAPNoteSearch extends Activity {
 		}
 		
 		public void onLoadResource(WebView view, String url){
+			authAttempts=0;
 			Log.d(this.getClass().getName(), "onLoadResource:" + url);
 			updateLoading(true);
 			if (url != null && url.contains("/sap/support/notes/")) {
@@ -239,12 +242,19 @@ public class SAPNoteSearch extends Activity {
 		@Override
 		public void onReceivedHttpAuthRequest(WebView view,
 				HttpAuthHandler handler, String host, String realm) {
-
+			authAttempts++;
+			if (authAttempts>=10){
+				Toast.makeText(SAPNoteSearch.this, getString(R.string.HTTPAuthenticationFailed),
+						Toast.LENGTH_LONG).show();
+				Intent i = new Intent(SAPNoteSearch.this, SAPNotePreferences.class);
+				startActivity(i);
+				view.stopLoading();
+				return;
+			}
 			SharedPreferences settings = getSharedPreferences(SAPNotePreferences.PREFS_NAME, 0);
 			String sapuser = settings.getString(SAPNotePreferences.KEY_SAP_USERNAME, null);
 			String sappwd = settings.getString(SAPNotePreferences.KEY_SAP_PASSWORD, null);
 
-			assert (sapuser != null);
 
 			handler.proceed(sapuser, sappwd);
 			// super.onReceivedHttpAuthRequest(view, handler, host, realm);
@@ -260,6 +270,7 @@ public class SAPNoteSearch extends Activity {
 			Toast.makeText(SAPNoteSearch.this,
 					"An error has occured: " + description, Toast.LENGTH_LONG)
 					.show();
+			authAttempts=0;
 		}
 
 	}
