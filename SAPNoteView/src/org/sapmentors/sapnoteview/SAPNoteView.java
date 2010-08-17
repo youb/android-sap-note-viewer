@@ -247,6 +247,7 @@ public class SAPNoteView extends Activity {
 	private class DownloadNoteTask extends AsyncTask<String, String, String> {
 		CustomRedirectHandler redirectHandler;
 		String downloadUrl;
+		private int responseCode;
 		
 		protected String doInBackground(String... urls) {
 			redirectHandler = new CustomRedirectHandler();
@@ -294,7 +295,7 @@ public class SAPNoteView extends Activity {
 				//Do the actual http call
 				HttpResponse response = httpclient.execute(httpget);
 				
-				int responseCode = response.getStatusLine().getStatusCode();
+				responseCode = response.getStatusLine().getStatusCode();
 				
 				HttpEntity entity = response.getEntity();
 				String contentType = entity.getContentType().getValue();
@@ -340,12 +341,23 @@ public class SAPNoteView extends Activity {
 		
 		
 		protected void onPostExecute(String htmlOrg) {
+			
+			
 			if(htmlOrg==null || htmlOrg.equals("")){
-				Toast.makeText(SAPNoteView.this,
-						"Problems with download. Attempting backup solution",
-						Toast.LENGTH_LONG).show();
-				webview.loadUrl(downloadUrl);
-				return;
+				if (responseCode==401){
+					//we've attempted authentication but it has failed
+					Toast.makeText(SAPNoteView.this, getString(R.string.HTTPAuthenticationFailed),
+							Toast.LENGTH_LONG).show();
+					Intent i = new Intent(SAPNoteView.this, SAPNotePreferences.class);
+					startActivity(i);
+					return;
+				}else {
+					Toast.makeText(SAPNoteView.this,
+							"Problems with download. Attempting backup solution",
+							Toast.LENGTH_LONG).show();
+					webview.loadUrl(downloadUrl);
+					return;
+				}
 			}
 			publishProgress("Note loaded, now adjusting HTML to fix problems");
 			// if we followed a link, we need to sniff the note number from
@@ -509,7 +521,6 @@ public class SAPNoteView extends Activity {
 
 	private class SAPNoteViewClient extends WebViewClient {
 		private boolean bHaveTriedManual = false;
-		private boolean bAttemptedAuth=false;
 
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -538,7 +549,6 @@ public class SAPNoteView extends Activity {
 
 		public void onLoadResource(WebView view, String url) {
 			Log.d(this.getClass().getName(), "onLoadResource:" + url);
-			bAttemptedAuth=false;
 			updateLoading(true);
 		}
 
@@ -559,23 +569,12 @@ public class SAPNoteView extends Activity {
 		public void onReceivedHttpAuthRequest(WebView view,
 				HttpAuthHandler handler, String host, String realm) {
 
-			Log.d(this.getClass().getName(), "onReceivedHttpAuthRequest:" + host + " bAttemptedAuth="+bAttemptedAuth);
-			if(!bAttemptedAuth){
-				SharedPreferences settings = getSharedPreferences(SAPNotePreferences.PREFS_NAME, 0);
-				String sapuser = settings.getString(SAPNotePreferences.KEY_SAP_USERNAME, null);
-				String sappwd = settings.getString(SAPNotePreferences.KEY_SAP_PASSWORD, null);
-	
-				bAttemptedAuth=true;
-				handler.proceed(sapuser, sappwd);
-			}else {
-				//we've attempted authentication but it has failed
-				Toast.makeText(SAPNoteView.this, getString(R.string.HTTPAuthenticationFailed),
-						Toast.LENGTH_LONG).show();
-				handler.cancel();
-				Intent i = new Intent(view.getContext(), SAPNotePreferences.class);
-				startActivity(i);
-				
-			}
+			Log.d(this.getClass().getName(), "onReceivedHttpAuthRequest:" + host);
+			SharedPreferences settings = getSharedPreferences(SAPNotePreferences.PREFS_NAME, 0);
+			String sapuser = settings.getString(SAPNotePreferences.KEY_SAP_USERNAME, null);
+			String sappwd = settings.getString(SAPNotePreferences.KEY_SAP_PASSWORD, null);
+
+			handler.proceed(sapuser, sappwd);
 			
 		}
 
@@ -590,7 +589,7 @@ public class SAPNoteView extends Activity {
 			bHaveTriedManual = false;
 			Toast.makeText(SAPNoteView.this,
 					"An error has occured: " + description, Toast.LENGTH_LONG)
-					.show();
+					.show();		
 			updateLoading(false);
 		}
 
