@@ -6,4 +6,7 @@
     <item android:id="@+id/menuShare"
           android:title="@string/menuShare"
           android:icon="@android:drawable/ic_menu_share"  />
+    <item android:id="@+id/menuDownloadPdf"
+          android:title="@string/menuDownloadPdf"
+          android:icon="@android:drawable/ic_menu_save"  />          
 </menu>
