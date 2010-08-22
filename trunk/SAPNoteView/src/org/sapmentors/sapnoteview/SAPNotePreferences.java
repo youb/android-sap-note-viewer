@@ -1,6 +1,9 @@
 package org.sapmentors.sapnoteview;
 
 
+import java.io.File;
+import java.io.IOException;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,6 +11,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -30,7 +34,7 @@ public class SAPNotePreferences extends PreferenceActivity implements OnSharedPr
 	public static final String KEY_PDF_DOWNLOAD_FOLDER="DownloadFolder";
 	
 	public static final boolean DEFAULT_VALUE_DO_ANALYTICS=true;
-	public static final String DEFAULT_VALUE_PDF_DOWNLOAD_FOLDER="/sdcard/sapnotes";
+	public static final String DEFAULT_VALUE_PDF_DOWNLOAD_FOLDER="sapnotes";
 	
 	protected EditTextPreference editTextUser;
 	protected EditTextPreference editTextPassword;
@@ -80,7 +84,14 @@ public class SAPNotePreferences extends PreferenceActivity implements OnSharedPr
         root.addPreference(otherCat);
         
         editTextDownloadFolder = new EditTextPreference(this);
-        editTextDownloadFolder.setDefaultValue(DEFAULT_VALUE_PDF_DOWNLOAD_FOLDER);
+        try {
+        	//dynamically find sd card directory
+        	 File dir = Environment.getExternalStorageDirectory();
+			editTextDownloadFolder.setDefaultValue(dir.getCanonicalPath() + DEFAULT_VALUE_PDF_DOWNLOAD_FOLDER);
+		} catch (IOException e) {
+			editTextDownloadFolder.setDefaultValue("/mnt/sdcard/"+DEFAULT_VALUE_PDF_DOWNLOAD_FOLDER);
+		}
+        
         editTextDownloadFolder.setKey(KEY_PDF_DOWNLOAD_FOLDER);
         editTextDownloadFolder.setDialogTitle(R.string.lblDownloadFolderDialogTitle);
         editTextDownloadFolder.setTitle(R.string.lblDownloadFolderTitle);
@@ -97,6 +108,7 @@ public class SAPNotePreferences extends PreferenceActivity implements OnSharedPr
         updateSummaryBasedOnValue();
         
         return root;
+        
     }
     
     private void updateSummaryBasedOnValue(){

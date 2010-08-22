@@ -1,6 +1,8 @@
 package org.sapmentors.sapnoteview;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -39,6 +41,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.AndroidCharacter;
 import android.text.Editable;
 import android.util.Log;
@@ -234,6 +237,12 @@ public class SAPNoteView extends Activity {
 
 	}
 	
+	private void downloadPDF(String strNote){
+		updateLoading(true);
+		new DownloadFileTask().execute(strNote);
+	}
+	
+	
 	private void updateLoading(boolean isLoading){
 		ProgressBar loadingIndicator = (ProgressBar) findViewById(R.id.title_loading);
 		if(isLoading){
@@ -400,6 +409,140 @@ public class SAPNoteView extends Activity {
 		}
 	}
 
+	
+	private class DownloadFileTask extends AsyncTask<String, String, File> {
+		private int responseCode;
+		private String downloadDirectory;
+		
+		protected File doInBackground(String... noteNr) {
+			String strNote=noteNr[0];
+			return downloadFileInternal(strNote);
+		}
+
+		/**
+		 * Progress messages to be displayed in UI thread
+		 * but originating from asynctask 
+		 */
+		protected void onProgressUpdate(String... status) {
+			Toast.makeText(SAPNoteView.this, status[0],
+					Toast.LENGTH_LONG).show();
+		}
+
+		/**
+		 * The main async method.
+		 * Needed since we need to adjust the HTML 
+		 * and sniff out the note name
+		 * 
+		 * @param strURL
+		 * @return
+		 */
+		private File downloadFileInternal(String strNote) {
+
+			DefaultHttpClient httpclient = null;
+			try {
+				String url = "https://service.sap.com/sap/bc/bsp/spn/no_display_pdf/sapnote.htm?numm="+strNote+"&vers=0000000000&language=E&sap-language=E";
+				httpclient = new DefaultHttpClient();
+
+				SharedPreferences settings = getSharedPreferences(SAPNotePreferences.PREFS_NAME, 0);
+				String sapuser = settings.getString(SAPNotePreferences.KEY_SAP_USERNAME, null);
+				String sappwd = settings.getString(SAPNotePreferences.KEY_SAP_PASSWORD, null);
+				downloadDirectory = settings.getString(SAPNotePreferences.KEY_PDF_DOWNLOAD_FOLDER, null);
+
+				//setup authentication
+				httpclient.getCredentialsProvider().setCredentials(
+						new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
+						new UsernamePasswordCredentials(sapuser, sappwd));
+
+				HttpGet httpget = new HttpGet(url);
+			   
+				//Do the actual http call
+				HttpResponse response = httpclient.execute(httpget);
+				
+				responseCode = response.getStatusLine().getStatusCode();
+				HttpEntity entity = response.getEntity();
+				String contentType = entity.getContentType().getValue();
+				
+				Log.d(this.getClass().getName(), "Response code " + responseCode + " Response has contentType "
+						+ contentType);
+				
+				if(responseCode==401){
+					//we don't report this as the backup solution will provide the message
+					return null;
+				}
+
+				InputStream in = entity.getContent();
+				
+				
+				File strDir = Environment.getExternalStorageDirectory();
+				
+				File dir = new File(downloadDirectory);
+				
+				if(!dir.exists()){
+					dir.mkdir();
+				}
+				
+				File file = new File(downloadDirectory,strNote+".pdf");
+
+				
+				FileOutputStream fOut = new FileOutputStream(file);
+	
+				
+				publishProgress("Downloading pdf for note " + strNote + " to "+ file.getCanonicalPath()); 
+				
+				byte[] buffer = new byte[1024];
+				int len1 = 0;
+				while ( (len1 = in.read(buffer)) != -1 ) {
+					fOut.write(buffer,0, len1);
+				}
+				
+				if (entity != null) {
+					entity.consumeContent();
+				}
+				return file;
+				
+			} catch (Exception e) {
+				Log.e(this.getClass().getName(), "Error during httpclient", e);
+				publishProgress("Got exception when downloading to "+ downloadDirectory + " " + e.getMessage() + "\nPlease check dowload folder settings"); 
+				
+				return null;
+			} finally {
+				// When HttpClient instance is no longer needed,
+				// shut down the connection manager to ensure
+				// immediate deallocation of all system resources
+				if (httpclient != null) {
+					httpclient.getConnectionManager().shutdown();
+				}
+			}
+
+		}
+		
+		
+		protected void onPostExecute(File file) {
+			updateLoading(false);
+			if(file!=null && file.exists()){
+				Uri path = Uri.fromFile(file);
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(path, "application/pdf");
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                try {
+                    startActivity(intent);
+                } 
+                catch (ActivityNotFoundException e) {
+                    Toast.makeText(SAPNoteView.this, 
+                        "No Application Available to View PDF", 
+                        Toast.LENGTH_SHORT).show();
+                }
+				
+				
+			}else {
+                Toast.makeText(SAPNoteView.this, 
+                        "Download of PDF failed", 
+                        Toast.LENGTH_SHORT).show();
+			}
+		}
+	}
+	
 	private void hideKeyboard() {
 		// close soft keyboard
 		InputMethodManager inputManager = (InputMethodManager) SAPNoteView.this
@@ -440,6 +583,11 @@ public class SAPNoteView extends Activity {
 			startActivity(Intent.createChooser(shareIntent, "Share note.."));
 			tracker.trackEvent("Note", "Shared", strNote2,0 );
 			return true;
+		case R.id.menuDownloadPdf:
+			String strNote3 = ((Editable) txtNote.getText()).toString();
+			downloadPDF(strNote3);
+			
+			return true;	
 		default:
 			return super.onMenuItemSelected(featureId, item);
 		}
@@ -527,7 +675,9 @@ public class SAPNoteView extends Activity {
 			Log.i(this.getClass().getName(), "Loading URL:" + url);
 			updateLoading(true);
 			if (url != null && url.contains("display_pdf")) {
-				return false;
+				String strNote = ((Editable) txtNote.getText()).toString();
+				downloadPDF(strNote);
+				return true;
 			} else {
 				// trying to make sure links to notes are loaded through our
 				// code
@@ -538,11 +688,12 @@ public class SAPNoteView extends Activity {
 					bHaveTriedManual = true;
 					bAttemptToSniffNoteFromHTTP = true;
 					viewNoteFromURL(url);
+					//TODO: This could actually allow the webview to load the url and only parse the title
+					//but currently we overwrite
+					
 					return true;
 				}
-
-				view.loadUrl(url);
-				return true;
+				return false;
 			}
 
 		}
