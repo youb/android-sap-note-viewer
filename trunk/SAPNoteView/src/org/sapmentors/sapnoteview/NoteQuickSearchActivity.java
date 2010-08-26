@@ -1,19 +1,15 @@
 package org.sapmentors.sapnoteview;
 
 
-import android.app.SearchManager;
 import android.app.TabActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Spannable;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.CursorAdapter;
-import android.widget.TabHost;
 import android.widget.TextView;
 
 public class NoteQuickSearchActivity extends TabActivity {

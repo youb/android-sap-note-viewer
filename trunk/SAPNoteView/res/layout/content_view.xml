@@ -20,7 +20,7 @@
 
 
 		<TextView android:layout_width="wrap_content"
-			android:textAppearance="?android:attr/textAppearanceMedium"
+			style="@style/LabelText"
 			android:layout_height="wrap_content" 
 			android:text="@string/lblNote" />
 		<EditText android:id="@+id/txtNote" 
@@ -29,6 +29,7 @@
 			android:layout_weight="1"
 			android:numeric="decimal"
 			android:maxLength="10"
+			android:paddingTop="1dip"
 			/>
 
 	

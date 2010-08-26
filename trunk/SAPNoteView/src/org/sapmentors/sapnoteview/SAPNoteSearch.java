@@ -5,10 +5,7 @@ package org.sapmentors.sapnoteview;
 import java.util.StringTokenizer;
 
 
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
-
 import android.app.Activity;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
