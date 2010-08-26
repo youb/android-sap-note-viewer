@@ -65,7 +65,7 @@
 	<string name="contextMenuDelete">Delete</string>
 
 	<!-- Note list activity strings -->
-	<string name="listNoNotes">No Notes have been stored. Select View Notes from menu to continue</string>
+	<string name="listNoNotes">You have no favorite notes. Add a favorite by click on the menu button whilst viewing a note.</string>
 
 	<!-- View activity strings -->
 	<string name="bView">View</string>

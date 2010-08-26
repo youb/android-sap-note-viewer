@@ -31,7 +31,7 @@ public class SAPNotePreferences extends PreferenceActivity implements OnSharedPr
 	public static final String KEY_PDF_DOWNLOAD_FOLDER="DownloadFolder";
 	
 	public static final boolean DEFAULT_VALUE_DO_ANALYTICS=true;
-	public static final String DEFAULT_VALUE_PDF_DOWNLOAD_FOLDER="sapnotes";
+	public static final String DEFAULT_VALUE_PDF_DOWNLOAD_FOLDER="/sapnotes";
 	
 	protected EditTextPreference editTextUser;
 	protected EditTextPreference editTextPassword;
@@ -88,7 +88,7 @@ public class SAPNotePreferences extends PreferenceActivity implements OnSharedPr
         	 File dir = Environment.getExternalStorageDirectory();
 			editTextDownloadFolder.setDefaultValue(dir.getCanonicalPath() + DEFAULT_VALUE_PDF_DOWNLOAD_FOLDER);
 		} catch (IOException e) {
-			editTextDownloadFolder.setDefaultValue("/mnt/sdcard/"+DEFAULT_VALUE_PDF_DOWNLOAD_FOLDER);
+			editTextDownloadFolder.setDefaultValue("/mnt/sdcard"+DEFAULT_VALUE_PDF_DOWNLOAD_FOLDER);
 		}
         
         editTextDownloadFolder.setKey(KEY_PDF_DOWNLOAD_FOLDER);
