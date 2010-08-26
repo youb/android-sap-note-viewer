@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 /**
  * Simple notes database access helper class. Defines the basic CRUD operations
@@ -23,7 +22,6 @@ public class SAPNoteDbAdapter {
     public static final String KEY_TITLE = "title";
     public static final String KEY_NOTENR = "_id";
 
-    private static final String TAG = "SAPNotesDbAdapter";
     private DatabaseHelper mDbHelper;
     private SQLiteDatabase mDb;
     
