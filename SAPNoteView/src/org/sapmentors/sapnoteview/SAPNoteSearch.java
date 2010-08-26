@@ -40,7 +40,6 @@ public class SAPNoteSearch extends Activity {
 
 	private WebView webview;
 
-	private GoogleAnalyticsTracker tracker;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -67,9 +66,7 @@ public class SAPNoteSearch extends Activity {
 		UIFrameworkSetup();
 		
 		//anonymous tracker
-		tracker = GoogleAnalyticsTracker.getInstance();
-	    tracker.start(Analytics.ANALYTICS_ID, 60,this);
-	    tracker.trackPageView("/search");
+		Analytics.trackPageView(this,"/search");
 
 		webview = (WebView) findViewById(R.id.webview);
 		webview.setWebViewClient(new SAPNoteViewClient());

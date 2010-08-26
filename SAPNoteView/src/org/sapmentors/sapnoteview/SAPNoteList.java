@@ -34,7 +34,6 @@ public class SAPNoteList extends ListActivity {
 	private static final int ACTION_SHARE= Menu.FIRST+1;
 	private static final int ACTION_DELETE = Menu.FIRST + 2;
 	
-	GoogleAnalyticsTracker tracker;
 
 	private SAPNoteDbAdapter mDbHelper;
 
@@ -46,9 +45,7 @@ public class SAPNoteList extends ListActivity {
 		UIFrameworkSetup();
 		
 		//anonymous tracker
-		tracker = GoogleAnalyticsTracker.getInstance();
-	    tracker.start(Analytics.ANALYTICS_ID, 60,this);
-	    tracker.trackPageView("/favorites");
+		Analytics.trackPageView(this,"/favorites");
 		
 		
 		mDbHelper = new SAPNoteDbAdapter(this);
@@ -128,6 +125,7 @@ public class SAPNoteList extends ListActivity {
 			shareIntent.setAction(Intent.ACTION_SEND);
 			shareIntent.setType("text/plain");
 			shareIntent.putExtra(Intent.EXTRA_TEXT, shareTxt);
+			Analytics.trackEvent(this,"Note", "Shared", strNote2);
 			
 			/* Send it off to the Activity-Chooser */  
 			startActivity(Intent.createChooser(shareIntent, "Share note.."));  

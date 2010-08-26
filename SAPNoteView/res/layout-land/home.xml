@@ -48,16 +48,6 @@
                 style="@style/HomeButton"
                 android:text="@string/btn_starred"
                 android:drawableTop="@drawable/home_btn_starred"/>                
-
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
             <Button android:id="@+id/home_btn_search"
                 style="@style/HomeButton"
                 android:text="@string/btn_search"
@@ -67,16 +57,11 @@
                 style="@style/HomeButton"
                 android:text="@string/btn_setup"
                 android:drawableTop="@drawable/home_btn_sandbox"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
-
 
         </LinearLayout>
+
+
+
     </LinearLayout>
 <!-- FOOTER -->
     <LinearLayout

@@ -78,7 +78,6 @@ public class SAPNoteView extends Activity {
 
 	private SAPNoteDbAdapter mDbHelper;
 
-	private GoogleAnalyticsTracker tracker;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -108,9 +107,7 @@ public class SAPNoteView extends Activity {
 		UIFrameworkSetup();
 
 		// anonymous tracker
-		tracker = GoogleAnalyticsTracker.getInstance();
-		tracker.start(Analytics.ANALYTICS_ID, 30, this);
-		tracker.trackPageView("/view");
+		Analytics.trackPageView(this,"/view");
 
 		// set up view
 		txtNote = (EditText) findViewById(R.id.txtNote);
@@ -215,6 +212,7 @@ public class SAPNoteView extends Activity {
 	 */
 	private void viewNote(String strNote) {
 		String strURL = "https://service.sap.com/sap/support/notes/" + strNote;
+		Analytics.trackEvent(this,"Note", "View", strNote);
 		viewNoteFromURL(strURL);
 	}
 
@@ -568,6 +566,7 @@ public class SAPNoteView extends Activity {
 		case R.id.menuAdd:
 			String strNote = ((Editable) txtNote.getText()).toString();
 			addNoteToFavorites(strNote);
+			Analytics.trackEvent(this,"Note", "Favorite", strNote);
 			
 			return true;
 		case R.id.menuShare:
@@ -581,10 +580,11 @@ public class SAPNoteView extends Activity {
 
 			/* Send it off to the Activity-Chooser */
 			startActivity(Intent.createChooser(shareIntent, "Share note.."));
-			tracker.trackEvent("Note", "Shared", strNote2,0 );
+			Analytics.trackEvent(this,"Note", "Shared", strNote2);
 			return true;
 		case R.id.menuDownloadPdf:
 			String strNote3 = ((Editable) txtNote.getText()).toString();
+			Analytics.trackEvent(this,"Note", "DownloadPDF", strNote3);
 			downloadPDF(strNote3);
 			
 			return true;	
@@ -650,10 +650,9 @@ public class SAPNoteView extends Activity {
 				Toast.makeText(SAPNoteView.this,
 						"Added note " + lngNote + " to favorites",
 						Toast.LENGTH_SHORT).show();
-				tracker.trackEvent("Note", "Favorite", strNote,0 );
 			} else {
 				Toast.makeText(SAPNoteView.this,
-						"Failed to add " + lngNote + " to favorites",
+						"Note " + lngNote + " is already a favorites",
 						Toast.LENGTH_SHORT).show();
 			}
 
