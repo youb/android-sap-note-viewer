@@ -9,13 +9,10 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.provider.BaseColumns;
-import android.util.Log;
 
 /**
  * Simple notes database access helper class. Defines the basic CRUD operations
@@ -32,7 +29,6 @@ public class SAPNoteProvider extends ContentProvider {
     public static final String KEY_TITLE = "title";
     public static final String KEY_NOTENR = "_id";
 
-    private static final String TAG = "SAPNotesDbAdapter";
     private DatabaseHelper dbHelper;
 
     private static final String DATABASE_NAME = "data";
