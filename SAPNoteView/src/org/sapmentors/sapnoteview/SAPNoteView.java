@@ -1,11 +1,8 @@
 package org.sapmentors.sapnoteview;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -25,9 +22,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultRedirectHandler;
 import org.apache.http.protocol.HttpContext;
 import org.sapmentors.sapnoteview.db.SAPNoteDbAdapter;
-
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
-
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -39,10 +33,7 @@ import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.text.AndroidCharacter;
 import android.text.Editable;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -50,13 +41,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.DownloadListener;
 import android.webkit.HttpAuthHandler;
 import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -471,8 +460,6 @@ public class SAPNoteView extends Activity {
 				InputStream in = entity.getContent();
 				
 				
-				File strDir = Environment.getExternalStorageDirectory();
-				
 				File dir = new File(downloadDirectory);
 				
 				if(!dir.exists()){
@@ -705,7 +692,6 @@ public class SAPNoteView extends Activity {
 		@Override
 		public void onPageFinished(WebView view, String url) {
 			Log.d(this.getClass().getName(), "onPageFinished:" + url);
-			int contentHeight = webview.getContentHeight();
 			super.onPageFinished(view, url);
 			bHaveTriedManual = false;
 			updateLoading(false);

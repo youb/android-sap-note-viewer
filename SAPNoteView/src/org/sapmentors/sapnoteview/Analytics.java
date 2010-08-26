@@ -2,7 +2,6 @@ package org.sapmentors.sapnoteview;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 

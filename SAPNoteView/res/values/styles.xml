@@ -91,6 +91,16 @@
         <item name="android:ellipsize">end</item>
     </style>
     
+    <style name="LabelText">
+        <item name="android:textSize">18sp</item>
+        <item name="android:paddingLeft">6dip</item>
+        <item name="android:paddingRight">6dip</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/label_text</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+    </style>    
+    
     <!-- Below are quick search styles. see list_item_note_search -->
     <style name="ListItem">
         <item name="android:minHeight">?android:attr/listPreferredItemHeight</item>
