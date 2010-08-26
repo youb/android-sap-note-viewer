@@ -51,6 +51,8 @@ public class SAPNotePreferences extends PreferenceActivity implements OnSharedPr
         setContentView(R.layout.activity_preferences);          
 	    
         UIFrameworkSetup();
+        
+        Analytics.trackPageView(this,"/preferences");
     }
 
     private PreferenceScreen createPreferenceHierarchy() {

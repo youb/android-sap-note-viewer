@@ -32,12 +32,10 @@ public class SAPNoteHome extends Activity {
 
 		setContentView(R.layout.home);
 
-		//anonymous tracker
-		tracker = GoogleAnalyticsTracker.getInstance();
-	    tracker.start(Analytics.ANALYTICS_ID, 60,this);
-	    tracker.trackPageView("/home");
-	    
-		tracker.trackEvent("System", "AndroidOS", Build.VERSION.RELEASE,0 );
+		// anonymous tracker
+		Analytics.trackPageView(this,"/home");
+		Analytics.trackEvent(this,"System", "AndroidOS", Build.VERSION.RELEASE);
+		Analytics.trackEvent(this,"System", "Device", Build.MODEL);
 	    
 		
 		final Activity thisActivity=this;
@@ -87,7 +85,7 @@ public class SAPNoteHome extends Activity {
 		bMentors.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("http://sapmentors.sap.com"));
-				tracker.trackPageView("/sapmentors");
+				Analytics.trackPageView(SAPNoteHome.this,"/sapmentors");
 				startActivity(i);
 			}
 		});	
