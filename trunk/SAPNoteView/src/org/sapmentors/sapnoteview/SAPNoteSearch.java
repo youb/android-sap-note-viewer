@@ -28,8 +28,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class SAPNoteSearch extends Activity {
-	private final String SEARCH_PRIMARY_URL="https://service.sap.com/xsearch";
-	private final String SEARCH_SECONDARY_URL="https://service.sap.com/notes";
+	private final String SEARCH_PRIMARY_URL="https://service.sap.com/notes";
+	private final String SEARCH_SECONDARY_URL="https://service.sap.com/xsearch";
 	
 
 
@@ -101,9 +101,7 @@ public class SAPNoteSearch extends Activity {
 		ImageButton bSearch = (ImageButton) thisActivity.findViewById(R.id.title_search_button);
 		bSearch.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				Intent i = new Intent(thisActivity, SAPNoteSearch.class);
-				i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				thisActivity.startActivity(i);
+				onSearchRequested();
 			}
 		});
 	}	
@@ -208,7 +206,7 @@ public class SAPNoteSearch extends Activity {
 		public void onReceivedHttpAuthRequest(WebView view,
 				HttpAuthHandler handler, String host, String realm) {
 			authAttempts++;
-			if (authAttempts>=10){
+			if (authAttempts>=20){
 				Toast.makeText(SAPNoteSearch.this, getString(R.string.HTTPAuthenticationFailed),
 						Toast.LENGTH_LONG).show();
 				Intent i = new Intent(SAPNoteSearch.this, SAPNotePreferences.class);
