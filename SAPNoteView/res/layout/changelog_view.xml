@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+        <ScrollView android:id="@+id/aboutscrollview" 
+                android:orientation="vertical"
+                android:layout_width="fill_parent" 
+                android:layout_height="fill_parent">    
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+                        <TextView android:text="Thanks for installing SAP Note Viewer for Android"
+                                android:layout_width="fill_parent" 
+                                android:layout_height="wrap_content"
+                                android:paddingLeft="15px"              
+                                android:layout_gravity="center_vertical"
+                                android:textColor="#ffffff" />  
+                        <TextView android:text="Changes: "
+                                android:layout_width="fill_parent" 
+                                android:layout_height="wrap_content"            
+                                android:paddingTop="15px"
+                                android:paddingLeft="15px"
+                                android:textStyle="bold"
+                                android:textColor="#ffffff" />
+                        <TextView android:text="v2.0: \n-Choose between standard or xSearch in setup\n-various bugfixes"
+                                android:layout_width="fill_parent" 
+                                android:layout_height="wrap_content"
+                                android:paddingLeft="15px"      
+                                android:paddingBottom="10px"            
+                                android:textColor="#ffffff" />
+                        <TextView android:text="v1.999: \n-New UI\n-Search\n-Download PDF\n-Support for KB notes(use printer friendly view for best results)\n-Anonymous analytics(can be disabled in settings)\n-Move to SD Card"
+                                android:layout_width="fill_parent" 
+                                android:layout_height="wrap_content"
+                                android:paddingLeft="15px"      
+                                android:paddingBottom="10px"            
+                                android:textColor="#ffffff" />
+                        <TextView android:text="v1.2:\n-Fixed rendering through on-the-fly HTML correctiong\n-Chrome to Phone"
+                                android:layout_width="fill_parent" 
+                                android:layout_height="wrap_content"
+                                android:paddingLeft="15px"      
+                                android:paddingBottom="10px"            
+                                android:textColor="#ffffff" />
+
+                        <TextView
+                                android:text="Regards\nDagfinn Parnas, SAP Mentor from Bouvet ASA"
+                                android:layout_width="fill_parent" 
+                                android:layout_height="wrap_content"
+                                android:paddingLeft="15px"
+                                android:autoLink="web"
+                                android:textColorLink="#ffffe0"                 
+                                android:textColor="#ffffff" />  
+                        </LinearLayout>
+                </ScrollView>                   
+</LinearLayout>

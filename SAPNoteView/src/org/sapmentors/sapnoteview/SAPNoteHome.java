@@ -3,10 +3,18 @@ package org.sapmentors.sapnoteview;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -80,9 +88,44 @@ public class SAPNoteHome extends Activity {
 				startActivity(i);
 			}
 		});	
-
 		
+		//evaluate if we will show changelog
+		try {
+			//current version
+			PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+			int versionCode = packageInfo.versionCode; 
+			
+			//version where changelog has been viewed
+			SharedPreferences settings = getSharedPreferences(SAPNotePreferences.PREFS_NAME, 0);
+			int viewedChangelogVersion = settings.getInt(SAPNotePreferences.KEY_CHANGELOG_VERSION_VIEWED, 0);
+			
+			if(viewedChangelogVersion<versionCode) {
+				Editor editor=settings.edit();
+				editor.putInt(SAPNotePreferences.KEY_CHANGELOG_VERSION_VIEWED, versionCode);
+				editor.commit();
+				displayChangeLog();
+			}
+		} catch (NameNotFoundException e) {
+			Log.w("Unable to get version code. Will not show changelog", e);
+		}	
 	}
 
+	private void displayChangeLog(){
+		
+		//load some kind of a view
+        LayoutInflater li = LayoutInflater.from(this);
+        View view = li.inflate(R.layout.changelog_view, null);
+	    
+        new AlertDialog.Builder(this)
+        .setTitle("Changelog")
+        .setIcon(android.R.drawable.ic_menu_info_details)
+        .setView(view)
+        .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int whichButton) {
+              //
+          }
+        }).show();
+        
+	}
 
 }

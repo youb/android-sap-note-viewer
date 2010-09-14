@@ -39,8 +39,14 @@
 	
 	<string name="lblAnalyticsTitle">Analytics</string>
 	<string name="lblAnalyticsSummary">Allow anonymous analytics in order to improve app</string>
-		
 	
+	<string name="lblSearchTitle">Search method used</string>
+	<string-array name="lblsSearch">
+       	<item>XSearch - Simplified</item>
+	    <item>Search - Standard</item>
+    </string-array>
+    <string name="lblSearchSummary">/notes Standard search</string>
+    <string name="lblXsearchSummary">/xSearch New and simplified search</string>
 	<!-- old -->
 
 

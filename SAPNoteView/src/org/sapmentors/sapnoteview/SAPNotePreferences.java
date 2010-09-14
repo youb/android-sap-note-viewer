@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
@@ -29,14 +30,20 @@ public class SAPNotePreferences extends PreferenceActivity implements OnSharedPr
 	public static final String KEY_SAP_PASSWORD="sappwd";
 	public static final String KEY_DO_ANALYTICS="DoAnalytics";
 	public static final String KEY_PDF_DOWNLOAD_FOLDER="DownloadFolder";
+	public static final String KEY_SEARCH_METHOD="SearchMethod";
+	public static final String KEY_CHANGELOG_VERSION_VIEWED="ChangelogVersionViewed";
 	
 	public static final boolean DEFAULT_VALUE_DO_ANALYTICS=true;
 	public static final String DEFAULT_VALUE_PDF_DOWNLOAD_FOLDER="/sapnotes";
+	public static final String VALUE_XSEARCH="/xsearch";
+	public static final String VALUE_SEARCH="/notes";
+	public static final String DEFAULT_VALUE_SEARCH= VALUE_XSEARCH;
 	
 	protected EditTextPreference editTextUser;
 	protected EditTextPreference editTextPassword;
 	protected EditTextPreference editTextDownloadFolder;
 	protected CheckBoxPreference cbAnalytics ;
+	protected ListPreference lpSearchUsed;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +111,14 @@ public class SAPNotePreferences extends PreferenceActivity implements OnSharedPr
         cbAnalytics.setSummary(R.string.lblAnalyticsSummary);
         otherCat.addPreference(cbAnalytics);
         
+        lpSearchUsed = new ListPreference(this);
+        lpSearchUsed.setDefaultValue(DEFAULT_VALUE_SEARCH);
+        lpSearchUsed.setKey(KEY_SEARCH_METHOD);
+        lpSearchUsed.setTitle(R.string.lblSearchTitle);
+        lpSearchUsed.setEntries(R.array.lblsSearch);
+        lpSearchUsed.setEntryValues(new String[]{VALUE_XSEARCH,VALUE_SEARCH});
+        otherCat.addPreference(lpSearchUsed);
+        
         updateSummaryBasedOnValue();
         
         return root;
@@ -127,6 +142,13 @@ public class SAPNotePreferences extends PreferenceActivity implements OnSharedPr
     	}else {
     		editTextDownloadFolder.setSummary(R.string.lblDownloadFolderSummaryBlank);
     	}
+    	
+    	if(lpSearchUsed.getValue().equals(VALUE_XSEARCH)){
+    		lpSearchUsed.setSummary(R.string.lblXsearchSummary);
+    	}else {
+    		lpSearchUsed.setSummary(R.string.lblSearchSummary);
+    	}
+    	
     }
 
 	@Override
