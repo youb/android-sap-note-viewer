@@ -3,6 +3,7 @@ package org.sapmentors.sapnoteview;
 
 
 import java.util.StringTokenizer;
+import java.util.prefs.Preferences;
 
 
 import android.app.Activity;
@@ -44,7 +45,7 @@ public class SAPNoteSearch extends Activity {
 
 		// if no user is setup, redirect to setup
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		String sapuser = settings.getString("sapuser", null);
+		String sapuser = settings.getString(SAPNotePreferences.KEY_SAP_USERNAME, null);
 		if (sapuser == null) {
 			Toast
 					.makeText(
@@ -81,7 +82,9 @@ public class SAPNoteSearch extends Activity {
                 }
 			}
 		});
-		viewSearch(SEARCH_PRIMARY_URL);
+		
+		String searchPath = settings.getString(SAPNotePreferences.KEY_SEARCH_METHOD, SAPNotePreferences.DEFAULT_VALUE_SEARCH);
+		viewSearch("https://service.sap.com"+searchPath);
 	}
 	
 	

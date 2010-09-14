@@ -8,17 +8,24 @@ import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 public class Analytics {
 	public final static String ANALYTICS_ID="UA-17758208-1";
 	private static GoogleAnalyticsTracker tracker = GoogleAnalyticsTracker.getInstance();
+	private static boolean isStarted=false;
 	
 	public static void trackPageView(Context context, String pageName){
 		if(isEnabled(context)){
-			tracker.start(Analytics.ANALYTICS_ID, context);
+			if(!isStarted){
+				tracker.start(Analytics.ANALYTICS_ID, 15, context);
+				isStarted=true;
+			}
 			tracker.trackPageView(pageName);
 		}
 	}
 	
 	public static void trackEvent (Context context, String category, String name, String value){
 		if(isEnabled(context)){
-			tracker.start(Analytics.ANALYTICS_ID, context);
+			if(!isStarted){
+				tracker.start(Analytics.ANALYTICS_ID, 15,context);
+				isStarted=true;
+			}
 			//analytics don't like whitespace
 			name = name.replaceAll(" ", "");
 			value= value.replaceAll(" ","");
