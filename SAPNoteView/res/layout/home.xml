@@ -9,8 +9,6 @@
 
 <!-- header -->
     <LinearLayout style="@style/TitleBar">
-        <ImageView style="@style/TitleBarLogo"
-            android:src="@drawable/title_logo_sap" />
 
         <TextView
        	 style="@style/TitleBarText" 

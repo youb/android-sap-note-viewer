@@ -24,6 +24,12 @@
                                 android:paddingLeft="15px"
                                 android:textStyle="bold"
                                 android:textColor="#ffffff" />
+                        <TextView android:text="v2.01: \n-Updated logo in order to not infringe on SAP Trademark"
+                                android:layout_width="fill_parent" 
+                                android:layout_height="wrap_content"
+                                android:paddingLeft="15px"      
+                                android:paddingBottom="10px"            
+                                android:textColor="#ffffff" />                        
                         <TextView android:text="v2.0: \n-Choose between standard or xSearch in setup\n-various bugfixes"
                                 android:layout_width="fill_parent" 
                                 android:layout_height="wrap_content"
