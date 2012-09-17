@@ -9,7 +9,7 @@
 	<string name="app_name">SAP Note Viewer</string>
 
 	<!-- UI framework home strings -->
-	<string name="title_text">Support note viewer</string>
+	<string name="title_text">SAP Support note viewer</string>
 	<string name="footer_text">Unofficial app brought to you by the</string>
 
 	<!-- UI framework main navigation elements -->
