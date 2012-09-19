@@ -1,4 +1,4 @@
-package org.sapmentors.sapnoteview;
+package org.sapmentors.sapnoteviewer;
 
 import android.app.Activity;
 import android.content.Intent;

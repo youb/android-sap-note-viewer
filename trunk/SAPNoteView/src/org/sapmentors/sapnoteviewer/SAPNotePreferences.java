@@ -1,8 +1,10 @@
-package org.sapmentors.sapnoteview;
+package org.sapmentors.sapnoteviewer;
 
 
 import java.io.File;
 import java.io.IOException;
+
+import org.sapmentors.sapnoteviewer.R;
 
 import android.app.Activity;
 import android.content.Intent;

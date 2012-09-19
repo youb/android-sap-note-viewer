@@ -1,7 +1,8 @@
-package org.sapmentors.sapnoteview;
+package org.sapmentors.sapnoteviewer;
 
-import org.sapmentors.sapnoteview.db.SAPNoteDbAdapter;
-import org.sapmentors.sapnoteview.db.SAPNoteProvider;
+import org.sapmentors.sapnoteviewer.R;
+import org.sapmentors.sapnoteviewer.db.SAPNoteDbAdapter;
+import org.sapmentors.sapnoteviewer.db.SAPNoteProvider;
 
 import android.app.Activity;
 import android.app.ListActivity;
