@@ -1,4 +1,6 @@
-package org.sapmentors.sapnoteview;
+package org.sapmentors.sapnoteviewer;
+
+import org.sapmentors.sapnoteviewer.R;
 
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
@@ -34,8 +36,7 @@ public class SAPNoteHome extends Activity {
 		// anonymous tracker
 		Analytics.trackPageView(this,"/home");
 		Analytics.trackEvent(this,"System", "AndroidOS", Build.VERSION.RELEASE);
-		Analytics.trackEvent(this,"System", "Device", Build.MODEL);
-	    
+		Analytics.trackEvent(this,"System", "Device", Build.MODEL);  
 		
 		final Activity thisActivity=this;
 		

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="org.sapmentors.sapnoteview"
-      android:versionCode="15"
-      android:versionName="2.01"
+      package="org.sapmentors.sapnoteviewer"
+      android:versionCode="18"
+      android:versionName="2.1"
       android:installLocation="auto"
       >
       <!-- -->
       
-    <application android:icon="@drawable/launcher_icon" android:label="@string/app_name" android:debuggable="true">
+    <application android:icon="@drawable/launcher_icon" android:label="@string/app_name">
         <activity android:name=".SAPNoteHome"
                   android:label="@string/app_name"
                   android:theme="@style/Theme.SAPAndroid">
@@ -97,7 +97,7 @@
         </activity>
 
         <activity
-            android:name=".QuickSearchActivity"
+            android:name="org.sapmentors.sapnoteviewerer.QuickSearchActivity"
             android:theme="@style/Theme.SAPAndroid"
             android:label="@string/title_search"
             android:launchMode="singleTop">
@@ -111,7 +111,7 @@
         <meta-data android:name="android.app.default_searchable" android:value=".SAPNoteView" />
 
         <provider
-            android:name=".db.SAPNoteProvider"
+            android:name="org.sapmentors.sapnoteviewer.db.SAPNoteProvider"
             android:authorities="org.sapmentors.sapnoteview.noteprovider"
          />
               

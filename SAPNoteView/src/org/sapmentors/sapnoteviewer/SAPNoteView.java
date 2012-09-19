@@ -1,4 +1,4 @@
-package org.sapmentors.sapnoteview;
+package org.sapmentors.sapnoteviewer;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -21,7 +21,9 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultRedirectHandler;
 import org.apache.http.protocol.HttpContext;
-import org.sapmentors.sapnoteview.db.SAPNoteDbAdapter;
+import org.sapmentors.sapnoteviewer.R;
+import org.sapmentors.sapnoteviewer.db.SAPNoteDbAdapter;
+
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;

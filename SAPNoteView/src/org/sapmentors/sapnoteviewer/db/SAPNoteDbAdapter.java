@@ -1,4 +1,4 @@
-package org.sapmentors.sapnoteview.db;
+package org.sapmentors.sapnoteviewer.db;
 
 import android.content.ContentValues;
 import android.content.Context;

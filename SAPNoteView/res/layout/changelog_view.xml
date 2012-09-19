@@ -24,7 +24,7 @@
                                 android:paddingLeft="15px"
                                 android:textStyle="bold"
                                 android:textColor="#ffffff" />
-                        <TextView android:text="v2.01: \n-Updated logo in order to not infringe on SAP Trademark"
+                        <TextView android:text="v2.1: \n-App up again after DMCA takedown.\nApparently the logo was infringing the SAP trademark. Instead of asking politely, they lawyered up and blocked the app.\nNo response from Google Play support, therefore the app is now published under a different id.\nThis means that user that have the previous version will not get any updates. Sorry for any inconvenience this may have caused."
                                 android:layout_width="fill_parent" 
                                 android:layout_height="wrap_content"
                                 android:paddingLeft="15px"      

@@ -1,9 +1,11 @@
-package org.sapmentors.sapnoteview;
+package org.sapmentors.sapnoteviewer;
 
 
 
 import java.util.StringTokenizer;
 import java.util.prefs.Preferences;
+
+import org.sapmentors.sapnoteviewer.R;
 
 
 import android.app.Activity;

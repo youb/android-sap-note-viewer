@@ -1,5 +1,7 @@
-package org.sapmentors.sapnoteview;
+package org.sapmentors.sapnoteviewer;
 
+
+import org.sapmentors.sapnoteviewer.R;
 
 import android.app.TabActivity;
 import android.content.Context;

@@ -1,4 +1,4 @@
-package org.sapmentors.sapnoteview;
+package org.sapmentors.sapnoteviewer;
 
 import android.content.Context;
 import android.content.SharedPreferences;
